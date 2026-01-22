@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  username      String   @unique @db.VarChar(150)
+  full_name     String   @db.VarChar(100)
+  email         String   @unique @db.VarChar(255)
+  password      String   @db.VarChar(255) 
+  photo_profile String?  @db.VarChar(255)
+  bio           String?  @db.VarChar(160)
+}
+
+model Thread {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.Text
+  image     String?  @db.VarChar(255)
+  number_of_replies Int
+
+  createdAt DateTime @default(now())
+  createdBy String
+
+  updatedAt DateTime @updatedAt
+  updatedBy String
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  threadId  Int
+
+  createdAt DateTime @default(now())
+  createdBy String
+
+  updatedAt DateTime @updatedAt
+  updatedBy String
+
+  @@unique([userId, threadId])
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  threadId  Int
+  image     String?  @db.VarChar(255)
+  content   String   @db.Text
+
+  created_at      DateTime @default(now())
+  created_by      String
+
+  updated_at      DateTime @default(now())
+  updated_by      String
+}
+
+model Following {
+  id              Int     @id @default(autoincrement())
+  following_id    String 
+  follower_id     String 
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now())
+
+  createdAt    DateTime @default(now())
+}

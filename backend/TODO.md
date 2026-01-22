@@ -1,0 +1,3 @@
+- [ ] Import thread router in src/app.ts
+- [ ] Add thread router to the Express app in src/app.ts
+- [ ] Run the server to test the thread endpoints
