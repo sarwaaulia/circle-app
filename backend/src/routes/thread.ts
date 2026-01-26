@@ -14,7 +14,7 @@ router.get(
 	threadController.getAllThreads,
 );
 
-// by threaad id
+// get by thread id
 router.get("/:id", authenticate, threadController.getThreadById);
 
 // create a new thread with uploas

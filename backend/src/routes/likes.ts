@@ -5,7 +5,7 @@ import threads from '../controllers/thread';
 const router = express.Router()
 
 // rread likes by thread id
-router.post("/:id/like", authenticate, threads.toggleLike);
+router.post("/:threadId/thread/like", authenticate, threads.toggleLike);
 
 router.get('/:id/like/status', authenticate, threads.getLikeStatus);
 

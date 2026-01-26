@@ -20,3 +20,13 @@ export const updateThreadSchema =  Joi.object({
     content: Joi.string().required(),
     image:  Joi.string().optional()
 })
+
+export const createThreadReplySchema = Joi.object({
+    content: Joi.string().required(),
+    image: Joi.string().optional()
+})
+
+export const updateThreadReplySchema = Joi.object({
+    content: Joi.string().optional(),
+    image: Joi.string().optional()
+})

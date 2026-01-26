@@ -73,7 +73,7 @@ export async function loginUser(
 		username: user.username,
 		full_name: user.full_name,
 		email: user.email,
-		photo_profile: user.photo_profile ? `${process.env.BASE_URL}/uploads/${user.photo_profile}` : null,
+		photo_profile: user.photo_profile ? `${user.photo_profile}` : null,
 		token,
 	};
 }

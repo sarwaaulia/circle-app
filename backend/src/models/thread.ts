@@ -4,8 +4,8 @@ const prisma = new PrismaClient();
 
 export interface createThread {
 	content: string;
-	image: string;
-	number_of_replies: number;
+	image?: string;
+	number_of_replies?: number;
 	createdBy: string;
 	updatedBy: string;
 }
@@ -15,39 +15,57 @@ export interface updateThread {
 	image?: string;
 	number_of_replies?: number;
 	updatedBy: string;
-	updated_at?: Date;
 }
 
 class ThreadModel {
 	static async create(data: createThread) {
-		// create thrread
-		return await prisma.thread.create({
+		return prisma.thread.create({
 			data: {
 				content: data.content,
 				image: data.image,
-				number_of_replies: data.number_of_replies,
+				number_of_replies: data.number_of_replies ?? 0,
 				createdBy: data.createdBy,
 				updatedBy: data.updatedBy,
 			},
 		});
 	}
 
-	// get thread
 	static async findAllThread() {
-		return await prisma.thread.findMany({
+		const threads = await prisma.thread.findMany({
 			orderBy: { createdAt: "desc" },
 		});
+
+		const userIds = [
+			...new Set(threads.map(t => Number(t.createdBy))),
+		];
+
+		const users = await prisma.user.findMany({
+			where: { id: { in: userIds } },
+			select: {
+				id: true,
+				username: true,
+				full_name: true,
+				photo_profile: true,
+			},
+		});
+
+		const userMap = mapUserById(users);
+
+		return threads.map(thread => ({
+			...thread,
+			user: userMap.get(Number(thread.createdBy)) || null,
+		}));
 	}
 
-	// get thread id
+	// get by thread id
 	static async getById(id: number) {
 		const thread = await prisma.thread.findUnique({
-			where: { id: id },
+			where: { id },
 		});
 		if (!thread) return null;
 
 		const user = await prisma.user.findUnique({
-			where: { id: parseInt(thread.createdBy) },
+			where: { id: Number(thread.createdBy) },
 			select: {
 				id: true,
 				username: true,
@@ -57,24 +75,20 @@ class ThreadModel {
 		});
 
 		return {
-			id: thread?.id,
-			content: thread?.content,
-			image: thread?.image,
-			number_of_replies: thread?.number_of_replies,
-			createdBy: thread?.createdBy,
-			updatedBy: thread?.updatedBy,
+			...thread,
 			user: user || null,
 		};
 	}
 
-	// get user id
+	// get by user id
 	static async getUserId(user_id: string) {
-		const thread = await prisma.thread.findMany({
+		const threads = await prisma.thread.findMany({
 			where: { createdBy: user_id },
 			orderBy: { createdAt: "desc" },
 		});
+
 		const user = await prisma.user.findUnique({
-			where: { id: parseInt(user_id) },
+			where: { id: Number(user_id) },
 			select: {
 				id: true,
 				username: true,
@@ -82,19 +96,16 @@ class ThreadModel {
 				photo_profile: true,
 			},
 		});
-		return thread.map((thread) => ({
-			id: thread.id,
-			content: thread.content,
-			image: thread.image,
-			number_of_replies: thread?.number_of_replies,
-			createdBy: thread?.createdBy,
-			updatedBy: thread?.updatedBy,
+
+		return threads.map(thread => ({
+			...thread,
 			user: user || null,
 		}));
 	}
 
+	// for updating thread
 	static async update(id: number, data: updateThread) {
-		return await prisma.thread.update({
+		return prisma.thread.update({
 			where: { id },
 			data: {
 				...data,
@@ -103,25 +114,22 @@ class ThreadModel {
 		});
 	}
 
+	// delete
 	static async deleteThread(id: number) {
-		return await prisma.thread.delete({
-			where: { id },
-		});
+		return prisma.thread.delete({ where: { id } });
 	}
 
-	// jumlah reply yang terisi
+	// reply auto terisi jika user reply suatu post
 	static async incrementReplies(id: number) {
-		return await prisma.thread.update({
+		return prisma.thread.update({
 			where: { id },
 			data: {
-				number_of_replies: {
-					increment: 1,
-				},
+				number_of_replies: { increment: 1 },
 			},
 		});
 	}
 
-	// content thread dengan user info
+	// searh thread
 	static async search(query: string) {
 		const threads = await prisma.thread.findMany({
 			where: {
@@ -130,36 +138,37 @@ class ThreadModel {
 					mode: "insensitive",
 				},
 			},
-			orderBy: {
-				createdAt: "desc",
+			orderBy: { createdAt: "desc" },
+		});
+
+		const userIds = [
+			...new Set(threads.map(t => Number(t.createdBy))),
+		];
+
+		const users = await prisma.user.findMany({
+			where: { id: { in: userIds } },
+			select: {
+				id: true,
+				username: true,
+				full_name: true,
+				photo_profile: true,
 			},
 		});
 
-		const threadsWithUser = await Promise.all(
-			threads.map(async (thread) => {
-				const user = await prisma.user.findUnique({
-					where: { id: parseInt(thread.createdBy) },
-					select: {
-						id: true,
-						username: true,
-						full_name: true,
-						photo_profile: true,
-					},
-				});
+		const userMap = mapUserById(users);
 
-				return {
-					id: thread.id,
-					content: thread.content,
-					image: thread.image,
-					number_of_replies: thread.number_of_replies,
-					created_at: thread.createdAt,
-					user: user || null,
-				};
-			}),
-		);
-
-		return threadsWithUser;
+		return threads.map(thread => ({
+			...thread,
+			user: userMap.get(Number(thread.createdBy)) || null,
+		}));
 	}
+}
+
+// 
+function mapUserById(users: any[]) {
+	const map = new Map<number, any>();
+	users.forEach(user => map.set(user.id, user));
+	return map;
 }
 
 export default ThreadModel;

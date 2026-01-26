@@ -9,6 +9,7 @@ import userRouteAuth from "./routes/auth";
 import threadRoute from "./routes/thread";
 import likesRoute from "./routes/likes";
 import userRoute from "./routes/user";
+import repliesRoute from "./routes/replies"
 
 import corsMiddleware from "./middlewares/cors";
 import path from "path";
@@ -30,6 +31,7 @@ console.log("SERVING UPLOADS FROM:", uploadsPath);
 // Routes
 app.use("/api/v1", authRoute, userRouteAuth);
 app.use("/api/v1", threadRoute, likesRoute, userRoute);
+app.use("/api/v1/replies", repliesRoute)
 
 // Error handling middleware
 app.use(
@@ -57,10 +59,15 @@ wss.on("connection", (ws) => {
 	console.log("New WebSocket client connected");
 
 	ws.on("message", (message) => {
-		console.log("Received:", message.toString());
-
-		// Broadcast ke semua client
-		broadcast({ type: "message", data: message.toString() });
+		try {
+			const payload = JSON.parse(message.toString())
+			if(payload.type === 'auth') {
+				console.log(`user authenticated`)
+				return;
+			}
+		} catch (error) {
+			console.error(`error processing data`)
+		}
 	});
 
 	ws.on("close", () => {
@@ -69,7 +76,7 @@ wss.on("connection", (ws) => {
 });
 
 // Jalankan server HTTP + WebSocket
-server.listen(port, () => {
+server.listen(process.env.PORT, () => {
 	console.log(`Server running on port ${port} (HTTP + WS)`);
 });
 

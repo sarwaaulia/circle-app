@@ -11,7 +11,7 @@ export default function ThreadList({
   return (
     <div className="w-full">
       {threads.map(thread => (
-        <ThreadCard key={thread.id} thread={thread} toggleLike={toggleLike} />
+        <ThreadCard key={thread.id ?? `${thread.createdAt}-${thread.content}`} thread={thread} toggleLike={toggleLike} />
       ))}
     </div>
   );

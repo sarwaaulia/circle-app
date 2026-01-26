@@ -1,7 +1,7 @@
 import cors from "cors";
 
 const corsMiddleware = cors({
-	origin: true,
+	origin: ["http://localhost:5173"],
 	credentials: true,
 });
 

@@ -6,14 +6,16 @@ export const useWebSocket = (url: string) => {
     const ws = useRef<WebSocket | null>(null);
 
     useEffect(() => {
-        // Inisialisasi koneksi
-        ws.current = new WebSocket(url);
+        // koneksi ke socket
+        ws.current = new WebSocket("ws://localhost:9000");
 
         ws.current.onopen = () => console.log("WS Connected to", url);
         
         ws.current.onmessage = (event) => {
             try {
+                // untuk menerima data dari be
                 const data = JSON.parse(event.data);
+                console.log("WS MESSAGE:", data);
                 setLastMessage(data);
             } catch (err) {
                 console.log("Received non-JSON message:", event.data);

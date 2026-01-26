@@ -40,7 +40,7 @@ export default function Register() {
 
 			const data = await response.json();
 			if (response.ok) {
-				setMsg("Registrasi successful!");
+				setMsg("Registration successfully!");
 				setUsername("");
 				setFullName("");
 				setEmail("");
@@ -49,7 +49,7 @@ export default function Register() {
 				setMsg(data.message || "Registration failed");
 			}
 		} catch (err) {
-			setMsg("somthing went wrong while registration, please try again later");
+			setMsg("Somthing went wrong while registration, please try again later");
 		}
 	};
 
@@ -58,7 +58,7 @@ export default function Register() {
 			<Card className="w-full w-200 max-w-md bg-zinc-900 border-zinc-800 shadow-2xl p-7">
 				<CardHeader className="space-y-1">
 					<CardTitle className="text-3xl text-start font-bold text-blue-500 capitalize">
-						circle app
+						Circle app
 					</CardTitle>
 					<p className="text-white text-start text-2xl capitalize">Create account circle</p>
 				</CardHeader>
@@ -79,7 +79,7 @@ export default function Register() {
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor="fullname" className="text-zinc-200">
-								fullname
+								Fullname
 							</Label>
 							<Input
 								type="text"
@@ -145,7 +145,7 @@ export default function Register() {
 						)}
 
 						<p className="text-center text-zinc-400 text-sm mt-4 capitalize">
-							already have an accoount?{" "}
+							Already have an accoount?{" "}
 							<Link
 								to="/login"
 								className="text-green-500"

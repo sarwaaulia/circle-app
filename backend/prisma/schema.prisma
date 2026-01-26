@@ -33,15 +33,14 @@ model Thread {
 model Like {
   id        Int      @id @default(autoincrement())
   userId    Int
-  threadId  Int
+  threadId  Int?
+  replyId   Int?
 
   createdAt DateTime @default(now())
   createdBy String
 
   updatedAt DateTime @updatedAt
   updatedBy String
-
-  @@unique([userId, threadId])
 }
 
 model Reply {

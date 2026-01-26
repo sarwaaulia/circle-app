@@ -6,18 +6,22 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AuthContext } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setAuth } from "@/stores/userSlice";
 
 export default function Login() {
+	// untuk akses status login
 	const context = useContext(AuthContext);
-	if (!context) {
-		return null;
-	}
+	if (!context) return null;
+
 	const { login } = context;
+	// pindah halaman setelah login berhasil
+	const navigate = useNavigate();
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [msg, setMsg] = useState("");
-	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	const handleLogin = async (
 		e: React.FormEvent<HTMLFormElement>,
@@ -29,24 +33,46 @@ export default function Login() {
 			const response = await fetch("http://localhost:9000/api/v1/login", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					email,
-					password,
-				}),
+				body: JSON.stringify({ email, password }),
 			});
 
 			const data = await response.json();
 			console.log("Response data:", data); // Tambahkan ini untuk debug
-			if (response.ok) {
-				if (data.data && data.data.token) {
-					login(data.data.token);
-					navigate("/");
-				} else {
-					setMsg("token not found while login");
-				}
-			} else {
+
+			if (!response.ok) {
 				setMsg(data.message || "Login failed");
+				return;
 			}
+			login(data.data.token);
+			// mengirim data ke redux
+			dispatch(
+				setAuth({
+					user: {
+						id: data.data.user_id,
+						username: data.data.username,
+						full_name: data.data.full_name,
+						email: data.data.email,
+						photo_profile: data.data.photo_profile,
+						header: data.data.header,
+						bio: data.data.bio,
+					},
+					token: data.data.token,
+				}),
+			);
+
+			// penyimpanan ke local storage
+			localStorage.setItem("currentUser", JSON.stringify({
+				id: data.data.user_id,
+				username: data.data.username,
+				full_name: data.data.full_name,
+				email: data.data.email,
+				photo_profile: data.data.photo_profile,
+				header: data.data.header,
+				bio: data.data.bio,
+			}));
+			localStorage.setItem("token", data.data.token);
+
+			navigate("/");
 		} catch (err) {
 			setMsg("somthing went wrong while login");
 		}

@@ -30,7 +30,7 @@ class ThreadController {
 						isLiked: Boolean(isLiked),
 						full_name: t.user?.full_name,
 						username: t.user?.username || "user",
-						avatar: t.user?.photo_profile || null,
+						photo_profile: t.user?.photo_profile || null,
 						userId: t.user?.id,
 					};
 				}),
@@ -168,15 +168,14 @@ class ThreadController {
 
 			const enrichedThread = {
 				...newThread,
-				full_name: user?.full_name,
-				username: user?.username || "user",
-				avatar: user?.photo_profile || null,
 				userId: user?.id,
+				username: user?.username || "user",
+				full_name: user?.full_name,
+				photo_profile: user?.photo_profile || null,
 			};
 
-			if (typeof broadcast === "function") {
-				broadcast({ type: "new_thread", thread: enrichedThread });
-			}
+			broadcast({ type: 'NEW_THREAD', thread: enrichedThread });
+			console.log("Broadcasting NEW_THREAD");
 
 			res.status(201).json({
 				success: true,
@@ -327,6 +326,7 @@ class ThreadController {
 			});
 		}
 	}
+
 	// Get like status and count
 	async getLikeStatus(req: Request, res: Response) {
 		try {
@@ -372,7 +372,7 @@ class ThreadController {
 	// Toggle like / unlike
 	async toggleLike(req: Request, res: Response) {
 		try {
-			const threadId = parseInt(req.params.id as string);
+			const threadId = parseInt(req.params.threadId as string);
 			const authUser = (req as any).user;
 
 			if (!authUser) {
@@ -395,12 +395,7 @@ class ThreadController {
 			// Kalau SUDAH LIKE → UNLIKE
 			if (existingLike) {
 				await prisma.like.delete({
-					where: {
-						userId_threadId: {
-							userId: userId,
-							threadId: threadId,
-						},
-					},
+					where: { id: existingLike.id },
 				});
 
 				const likesCount = await prisma.like.count({
@@ -408,7 +403,7 @@ class ThreadController {
 				});
 
 				broadcast({
-					type: "like_update",
+					type: "LIKE_UPDATE",
 					threadId,
 					userId,
 					liked: false,
@@ -418,7 +413,7 @@ class ThreadController {
 				return res.status(200).json({
 					success: true,
 					liked: false,
-					message: "Unliked",
+					message: "UNLIKED",
 				});
 			}
 
@@ -437,7 +432,7 @@ class ThreadController {
 			});
 
 			broadcast({
-				type: "like_update",
+				type: "LIKED_UPDATE",
 				threadId,
 				userId,
 				liked: true,

@@ -1,15 +1,17 @@
-# WebSocket Implementation Plan
+# TODO: Fix User Data Persistence and Thread Display Issues
 
-## Completed Tasks
+## Step 1: Fix localStorage Key Inconsistency
 
-- [x] Analyze project structure and existing code
-- [x] Identify WebSocket requirements and form submission issue
-- [x] Install socket.io-client dependency
-- [x] Create src/hooks/useWebSocket.ts hook
+- [x] Update AuthProvider.tsx to use "currentUser" instead of "user" for localStorage key to match userSlice.ts
 
-## Pending Tasks
+## Step 2: Sync AuthContext and Redux on Login
 
-- [ ] Fix form submission issue in PostModal
-- [ ] Implement real-time thread updates in Home.tsx
-- [ ] Implement real-time like updates in ThreadCard.tsx
-- [ ] Test WebSocket connection and real-time features
+- [x] Update Login.tsx to dispatch setUser action to Redux store after successful login
+
+## Step 3: Ensure Threads Include User Data
+
+- [x] Modify fetchThreads in Home.tsx to map currentUser data to threads if user data is missing from API response
+
+## Step 4: Handle User Data Persistence
+
+- [x] Ensure user data is available immediately after login in both AuthContext and Redux without relying on API fetch in App.tsx

@@ -16,3 +16,24 @@ export const broadcast = (data: any) => {
     }
   });
 };
+
+export const broadcastingNewThread = (dataThread: any) => {
+  broadcast({
+    type: 'NEW_THREAD',
+    data: dataThread
+  })
+}
+
+export const broadcastingNewReply = (replyData: any) => {
+  broadcast({
+    type: 'NEW_REPLY',
+    data: replyData
+  })
+}
+
+export const broadcastingNewLike = (likeData: any) => {
+  broadcast({
+    type: 'LIKE_UPDATE',
+    data: likeData  
+  })
+}
