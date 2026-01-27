@@ -1,5 +1,5 @@
 import express from "express";
-import { handleLogin, handleRegister } from "../controllers/user_auth";
+import { handleLogin, handleRegister, handleUpdateUser } from "../controllers/user_auth";
 import { authenticate } from "../middlewares/userAuth";
 import upload from "../utils/multer";
 import corsMiddleware from "../middlewares/cors";
@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.post("/register", upload.single("photo_profile"), handleRegister)
 
-router.post("/login", upload.single("photo_profile"), handleLogin)
+router.post("/login", handleLogin)
 
 
 // user
@@ -42,5 +42,10 @@ router.get("/me", corsMiddleware, authenticate, async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 })
+
+router.put("/user", authenticate, upload.fields([
+    {name: 'photo_profile'},
+    {name: 'header'}
+]), handleUpdateUser)
 
 export default router

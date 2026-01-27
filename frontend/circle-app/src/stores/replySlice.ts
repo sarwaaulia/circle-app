@@ -69,7 +69,13 @@ const replySlice = createSlice({
 			state.replies = action.payload;
 		},
 		addReply: (state, action: PayloadAction<Reply>) => {
-			state.replies.unshift(action.payload);
+			const exists = state.replies.some(
+				(reply) => reply.id === action.payload.id,
+			);
+
+			if (!exists) {
+				state.replies.unshift(action.payload);
+			}
 		},
 		clearReplies: (state) => {
 			state.replies = [];
@@ -95,8 +101,7 @@ const replySlice = createSlice({
 			.addCase(toggleReplyLike.pending, (state) => {
 				state.error = null;
 			})
-			.addCase(toggleReplyLike.fulfilled, (state, action) => {
-			})
+			.addCase(toggleReplyLike.fulfilled, (state, action) => {})
 			.addCase(toggleReplyLike.rejected, (state, action) => {
 				state.error = action.error.message || "Failed to toggle like";
 			});

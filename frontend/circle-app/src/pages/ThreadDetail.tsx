@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
 	fetchThreadReply,
 	toggleReplyLike,
-	addReply
+	addReply,
 } from "../stores/replySlice";
 import { toggleLike } from "../stores/threadSlice";
 import ThreadCard from "../components/thread/ThreadCard";
@@ -54,9 +54,9 @@ export default function ThreadDetailPage() {
 	const dispatch = useDispatch<any>();
 
 	const replyState = useSelector((state: any) => state.reply);
-    const replies = replyState?.replies || [];
-    const isRepliesLoading = replyState?.loading || false; // Bedakan namanya
-    const replyError = replyState?.error || null;
+	const replies = replyState?.replies || [];
+	const isRepliesLoading = replyState?.loading || false; // Bedakan namanya
+	const replyError = replyState?.error || null;
 
 	const currentUser = useSelector((state: any) => state.user.currentUser);
 
@@ -75,7 +75,7 @@ export default function ThreadDetailPage() {
 		if (currentUser && currentUser.photo_profile) {
 			setUserAva(`http://localhost:9000/uploads/${currentUser?.photo_profile}`);
 		} else {
-			setUserAva("https://ui-avatars.com/api/?name=" + currentUser?.username);;
+			setUserAva("https://ui-avatars.com/api/?name=" + currentUser?.username);
 		}
 	}, [currentUser]);
 
@@ -142,7 +142,7 @@ export default function ThreadDetailPage() {
 			}
 
 			const response = await fetch(
-				`http://localhost:9000/api/v1/replies/thread/${threadId}`,
+				`http://localhost:9000/api/v1/replies/${threadId}`,
 				{
 					method: "POST",
 					headers: {
@@ -246,14 +246,14 @@ export default function ThreadDetailPage() {
 	};
 
 	return (
-		<div className="max-w-2xl mx-auto">
+		<div className="h-screen border-x border-blue-850 max-w-3xl mx-auto overflow-y-auto">
 			{/* Status / Thread Header */}
 			<div
-				className="border-b border-blue-950 py-4 px-4 font-semibold text-lg flex items-center gap-2 cursor-pointer"
+				className="border-b border-blue-950 py-4 px-4 font-semibold text-lg text-blue-800 flex items-center gap-2 cursor-pointer"
 				onClick={navigateToHome}
 			>
 				<ArrowLeft size={20} />
-				Status
+				Thread Detail
 			</div>
 
 			{/* Thread utama */}
@@ -267,11 +267,7 @@ export default function ThreadDetailPage() {
 			/>
 
 			{/* Reply List */}
-			<ReplyList
-				replies={replies}
-				threadUser={threadUser}
-				toggleLike={handleToggleReplyLike}
-			/>
+			<ReplyList threadUser={thread.user} toggleLike={handleToggleReplyLike} />
 		</div>
 	);
 }

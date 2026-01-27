@@ -5,7 +5,7 @@ export interface Reply {
     created_at: string,
     likesCount?: number,
     isLiked?: boolean,
-    user?: {
+    user: {
         id: number,
         username: string
         full_name: string,

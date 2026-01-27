@@ -8,33 +8,51 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  username      String   @unique @db.VarChar(150)
-  full_name     String   @db.VarChar(100)
-  email         String   @unique @db.VarChar(255)
-  password      String   @db.VarChar(255) 
-  photo_profile String?  @db.VarChar(255)
-  bio           String?  @db.VarChar(160)
+  id            Int     @id @default(autoincrement())
+  username      String  @unique @db.VarChar(150)
+  full_name     String  @db.VarChar(100)
+  email         String  @unique @db.VarChar(255)
+  password      String  @db.VarChar(255)
+  photo_profile String? @db.VarChar(255)
+  bio           String? @db.VarChar(160)
+  header        String?
+
+  replies Reply[]
+
+  threadsCreated Thread[] @relation("ThreadCreatedBy")
+  threadsUpdated Thread[] @relation("ThreadUpdatedBy")
+
+  followers Following[] @relation("UserFollowers")
+  following Following[] @relation("UserFollowing")
 }
 
 model Thread {
-  id        Int      @id @default(autoincrement())
-  content   String   @db.Text
-  image     String?  @db.VarChar(255)
+  id                Int     @id @default(autoincrement())
+  content           String  @db.Text
+  image             String? @db.VarChar(255)
   number_of_replies Int
 
-  createdAt DateTime @default(now())
-  createdBy String
+  createdAt   DateTime @default(now())
+  createdById Int?
 
-  updatedAt DateTime @updatedAt
+  updatedAt   DateTime @updatedAt
+  updatedById Int?
+
+  // data lama
+  createdBy String
   updatedBy String
+
+  createdByUser User? @relation("ThreadCreatedBy", fields: [createdById], references: [id])
+  updatedByUser User? @relation("ThreadUpdatedBy", fields: [updatedById], references: [id])
+
+  replies Reply[]
 }
 
 model Like {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  threadId  Int?
-  replyId   Int?
+  id       Int  @id @default(autoincrement())
+  userId   Int
+  threadId Int?
+  replyId  Int?
 
   createdAt DateTime @default(now())
   createdBy String
@@ -44,25 +62,33 @@ model Like {
 }
 
 model Reply {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  threadId  Int
-  image     String?  @db.VarChar(255)
-  content   String   @db.Text
+  id       Int     @id @default(autoincrement())
+  userId   Int
+  threadId Int
+  image    String? @db.VarChar(255)
+  content  String  @db.Text
 
-  created_at      DateTime @default(now())
-  created_by      String
+  created_at DateTime @default(now())
+  created_by String
 
-  updated_at      DateTime @default(now())
-  updated_by      String
+  updated_at DateTime @default(now())
+  updated_by String
+
+  user   User   @relation(fields: [userId], references: [id])
+  thread Thread @relation(fields: [threadId], references: [id])
 }
 
 model Following {
-  id              Int     @id @default(autoincrement())
-  following_id    String 
-  follower_id     String 
-  created_at      DateTime @default(now())
-  updated_at      DateTime @default(now())
+  id Int @id @default(autoincrement())
 
-  createdAt    DateTime @default(now())
+  followerId  Int
+  followingId Int
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id])
+  following User @relation("UserFollowers", fields: [followingId], references: [id])
+
+  updated_at DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@unique([followerId, followingId])
 }

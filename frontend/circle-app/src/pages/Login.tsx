@@ -86,7 +86,7 @@ export default function Login() {
 						<CardTitle className="text-3xl font-bold text-white text-start capitalize mb-2">
 							circle<span className="text-blue-800">App</span>
 						</CardTitle>
-						<p className="text-white text-start text-xl">Login to Circle</p>
+						<p className="text-white text-start text-xl font-semibold">Login to Circle</p>
 					</CardHeader>
 					<CardContent>
 						<form onSubmit={handleLogin} className="space-y-4">
@@ -100,7 +100,7 @@ export default function Login() {
 									placeholder="m@example.com"
 									value={email}
 									onChange={(e) => setEmail(e.target.value)}
-									className="bg-zinc-800 border-zinc-700 text-white focus:ring-green-500"
+									className="bg-zinc-800 border-zinc-200 text-zinc-300 focus:ring-blue-500"
 									required
 								/>
 							</div>
@@ -115,7 +115,7 @@ export default function Login() {
 									placeholder="password"
 									value={password}
 									onChange={(e) => setPassword(e.target.value)}
-									className="bg-zinc-800 border-zinc-700 text-white focus:ring-green-500"
+									className="bg-zinc-800 border-zinc-200 text-zinc-300 focus:ring-blue-500"
 									required
 								/>
 							</div>
@@ -137,7 +137,7 @@ export default function Login() {
 
 							<Button
 								type="submit"
-								className="w-full py-5 rounded-full text-lg font-medium bg-blue-950 hover:bg-blue-700 text-white"
+								className="w-full py-5 rounded-full text-lg font-medium bg-blue-700 hover:bg-blue-900 text-zinc-300"
 							>
 								Login
 							</Button>
@@ -150,7 +150,7 @@ export default function Login() {
 								Don't have an account yet?{" "}
 								<Link
 									to="/register"
-									className="text-green-500 font-semibold hover:underline"
+									className="text-blue-500 font-semibold hover:underline"
 								>
 									Create Account
 								</Link>

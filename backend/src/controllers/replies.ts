@@ -6,6 +6,7 @@ import {
 	createThreadReplySchema,
 	updateThreadReplySchema,
 } from "../validation/auth_joi";
+import { broadcastingNewReply } from "../services/socket";
 
 class ReplyController {
 	// Create a new reply
@@ -48,44 +49,45 @@ class ReplyController {
 					message: "Thread not found",
 				});
 			}
-
-			// Create the reply
-			const newReply = await ThreadReply.create({
-				content,
-				image: image || "",
-				userId: authUser.id,
-				threadId: threadId,
-				created_by: authUser.id.toString(),
-				updated_by: authUser.id.toString(),
+			
+			const createdReply = await prisma.reply.create({
+				data: {
+					content,
+					image: image || "",
+					userId: authUser.id,
+					threadId,
+					created_by: authUser.id.toString(),
+					updated_by: authUser.id.toString(),
+				},
+				include: {
+					user: {
+						select: {
+							id: true,
+							username: true,
+							full_name: true,
+							photo_profile: true,
+						},
+					},
+				},
 			});
-
-			// Increment thread reply count
-			await ThreadModel.incrementReplies(threadId);
-
-			// Fetch the created reply
-			const createdReplyRaw = await prisma.reply.findUnique({
-				where: { id: newReply.id },
-			});
-
-			// Fetch user info
-			const userInfo = await prisma.user.findUnique({
-				where: { id: createdReplyRaw!.userId },
+			const updatedThread = await prisma.thread.update({
+				where: { id: threadId },
+				data: {
+					number_of_replies: {
+						increment: 1,
+					},
+				},
 				select: {
-					id: true,
-					username: true,
-					full_name: true,
-					photo_profile: true,
+					number_of_replies: true,
 				},
 			});
 
-			// Combine the data
-			const createdReply = {
-				id: createdReplyRaw!.id,
-				content: createdReplyRaw!.content,
-				image: createdReplyRaw!.image,
-				created_at: createdReplyRaw!.created_at,
-				user: userInfo,
-			};
+			// 3. Broadcast ke client
+			broadcastingNewReply({
+				threadId,
+				reply: createdReply,
+				repliesCount: updatedThread.number_of_replies,
+			});
 
 			res.status(201).json({
 				success: true,
@@ -260,7 +262,7 @@ class ReplyController {
 			const existLike = await prisma.like.findFirst({
 				where: {
 					replyId,
-					userId
+					userId,
 				},
 			});
 
@@ -281,7 +283,7 @@ class ReplyController {
 			await prisma.like.create({
 				data: {
 					replyId,
-          userId,
+					userId,
 					createdBy: String(userId),
 					updatedBy: String(userId),
 				},

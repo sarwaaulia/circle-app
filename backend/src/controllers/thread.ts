@@ -145,7 +145,8 @@ class ThreadController {
 				}
 			}
 			const authUser = (req as any).user;
-
+			
+			// Fetch user info for the new thread
 			const newThread = await ThreadModel.create({
 				content,
 				image: image || "",
@@ -154,34 +155,21 @@ class ThreadController {
 				updatedBy: authUser.id.toString(),
 			});
 
+			const fullThread = await ThreadModel.getById(newThread.id);
+
+			if(!fullThread) throw new Error("failed to retrieve complete thread data ");
 			
-			// Fetch user info for the new thread
-			const user = await prisma.user.findUnique({
-				where: { id: parseInt(newThread.createdBy) },
-				select: {
-					id: true,
-					username: true,
-					full_name: true,
-					photo_profile: true,
-				},
+
+			// BROADCAST DATA FINAL
+			broadcast({
+				type: "NEW_THREAD",
+				data: fullThread,
 			});
 
-			const enrichedThread = {
-				...newThread,
-				userId: user?.id,
-				username: user?.username || "user",
-				full_name: user?.full_name,
-				photo_profile: user?.photo_profile || null,
-			};
-
-			broadcast({ type: 'NEW_THREAD', thread: enrichedThread });
-			console.log("Broadcasting NEW_THREAD");
-
-			res.status(201).json({
-				success: true,
-				message: "Thread created successfully",
-				data: enrichedThread,
-			});
+			return res.status(201).json({
+            success: true,
+            data: fullThread
+        });
 		} catch (error) {
 			res.status(500).json({
 				success: false,
@@ -413,8 +401,9 @@ class ThreadController {
 				return res.status(200).json({
 					success: true,
 					liked: false,
-					message: "UNLIKED",
+					message: "LIKE_UPDATE",
 				});
+
 			}
 
 			// Kalau BELUM LIKE → CREATE LIKE
@@ -442,7 +431,7 @@ class ThreadController {
 			return res.status(200).json({
 				success: true,
 				liked: true,
-				message: "Liked",
+				message: "LIKED",
 			});
 		} catch (error) {
 			res.status(500).json({

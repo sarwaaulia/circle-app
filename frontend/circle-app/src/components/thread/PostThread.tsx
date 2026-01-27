@@ -2,6 +2,7 @@ import { useState, useImperativeHandle, forwardRef } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import PostModal from "./PostModal";
 import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 interface CreateThreadProps {
 	token: string;
@@ -30,8 +31,7 @@ const CreateThread = forwardRef<CreateThreadRef, CreateThreadProps>(
 			openModal: () => setOpenModal(true),
 		}));
 
-
-		// 3. Handle Pilihan Gambar & Preview
+		// select image and preview
 		const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
 			if (e.target.files && e.target.files[0]) {
 				const file = e.target.files[0];
@@ -40,7 +40,7 @@ const CreateThread = forwardRef<CreateThreadRef, CreateThreadProps>(
 			}
 		};
 
-		// 4. Submit Data (HTTP + WebSocket)
+		// sub
 		const handleSubmit = async (e: FormEvent) => {
 			e.preventDefault();
 			if (!content.trim() && !image) return;
@@ -48,7 +48,7 @@ const CreateThread = forwardRef<CreateThreadRef, CreateThreadProps>(
 			const form = new FormData();
 
 			form.append("content", content);
-			if (image) form.append("image", image);
+			if (image) {form.append("image", image)};
 
 			try {
 				const res = await fetch("http://localhost:9000/api/v1/threads", {
@@ -60,7 +60,10 @@ const CreateThread = forwardRef<CreateThreadRef, CreateThreadProps>(
 				const result = await res.json();
 
 				if (res.ok) {
-					if(isOnThreadCreate){
+					// toast notif
+					toast.success("Thread posted successfully!");
+
+					if (isOnThreadCreate) {
 						isOnThreadCreate(result.data);
 					}
 					// Reset Form
@@ -71,6 +74,7 @@ const CreateThread = forwardRef<CreateThreadRef, CreateThreadProps>(
 				}
 			} catch (error) {
 				console.error("Gagal mengirim postingan:", error);
+				toast.error("failed to post thread.");
 			} finally {
 				setLoading(false);
 			}
@@ -87,8 +91,9 @@ const CreateThread = forwardRef<CreateThreadRef, CreateThreadProps>(
 						<div className="flex gap-3">
 							<img
 								src={
-									currentUser?.photo_profile ? `http://localhost:9000/uploads/${currentUser.photo_profile}` :
-									"https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+									currentUser?.photo_profile
+										? `http://localhost:9000/uploads/${currentUser.photo_profile}`
+										: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
 								}
 								className="w-10 h-10 rounded-full object-cover"
 								alt="Profile"
@@ -167,8 +172,9 @@ const CreateThread = forwardRef<CreateThreadRef, CreateThreadProps>(
 					>
 						<img
 							src={
-								currentUser?.photo_profile ? `http://localhost:9000/uploads/${currentUser.photo_profile}` :
-								"https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+								currentUser?.photo_profile
+									? `http://localhost:9000/uploads/${currentUser.photo_profile}`
+									: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
 							}
 							className="w-10 h-10 rounded-full object-cover"
 							alt="Avatar"

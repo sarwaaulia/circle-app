@@ -24,12 +24,25 @@ export const broadcastingNewThread = (dataThread: any) => {
   })
 }
 
-export const broadcastingNewReply = (replyData: any) => {
+export const broadcastingNewReply = ({
+  threadId,
+  reply,
+  repliesCount,
+}: {
+  threadId: number;
+  reply: any;
+  repliesCount: number;
+}) => {
   broadcast({
-    type: 'NEW_REPLY',
-    data: replyData
-  })
-}
+    type: "NEW_REPLY",
+    data: {
+      threadId,
+      reply,
+      repliesCount,
+    },
+  });
+};
+
 
 export const broadcastingNewLike = (likeData: any) => {
   broadcast({

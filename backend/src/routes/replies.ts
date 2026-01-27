@@ -9,7 +9,7 @@ const router = express.Router()
 router.get('/thread/:threadId', authenticate, repliesController.getRepliesByThread);
 
 // create a new reply (protected)
-router.post("/:threadId", authenticate, upload.single("image"), repliesController.createReply);
+router.post("/:threadId", authenticate, upload.any(), repliesController.createReply);
 
 // update reply (protected)
 router.put('/:id', authenticate, repliesController.updateReply);
@@ -18,7 +18,7 @@ router.put('/:id', authenticate, repliesController.updateReply);
 router.delete('/:id', authenticate, repliesController.deleteReply);
 
 
-// toggle like untuk replies
+// TOGGLE LIKE UNTUK REPLY
 router.post("/:replyId/like", authenticate, repliesController.toggleLike)
 router.put("/:replyId/like", authenticate, repliesController.toggleLike);
 router.delete("/:replyId/like", authenticate, repliesController.toggleLike);

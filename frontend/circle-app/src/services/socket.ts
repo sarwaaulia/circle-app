@@ -1,4 +1,5 @@
 import { store } from "@/redux";
+import { addThread, updateThread, updateLikeStatusThread } from "@/stores/threadSlice";
 
 let socket: WebSocket | null = null;
 
@@ -27,16 +28,16 @@ export const connect = (token: string) => {
 	socket.onmessage = (event) => {
 		try {
 			const rawData = JSON.parse(event.data);
-        
-        // Cek jika data yang diterima masih berupa string (nested JSON)
-        // Seperti yang terlihat di console kamu: data: '{"type":"auth", ...}'
-        let finalData = rawData;
-        if (typeof rawData.data === 'string') {
-            finalData = JSON.parse(rawData.data);
-        }
 
-        console.log("Parsed WebSocket Data:", finalData);
-        handleGlobalUpdate(finalData);
+			// Cek jika data yang diterima masih berupa string (nested JSON)
+			// Seperti yang terlihat di console : data: '{"type":"auth", ...}'
+			let finalData = rawData;
+			if (typeof rawData.data === "string") {
+				finalData = JSON.parse(rawData.data);
+			}
+
+			console.log("Parsed WebSocket Data:", finalData);
+			handleGlobalUpdate(finalData);
 		} catch (error) {
 			console.log("Received WebSocket message (raw):", event.data);
 			try {
@@ -52,74 +53,67 @@ export const connect = (token: string) => {
 };
 
 const handleGlobalUpdate = (data: any) => {
-	console.log(`for handle realtime global update`, data);
+    switch (data.type) {
+        case "NEW_THREAD": {
+            const threadData = data.thread || data.data;
+            if (threadData) {
+                // ✅ Gunakan action creator
+                store.dispatch(addThread({
+                    ...threadData,
+                    likesCount: 0,
+                    isLiked: false,
+                }));
+            }
+            break;
+        }
 
-	switch (data.type) {
-		case "NEW_THREAD":
-			console.log("new thread ", data.thread || data.data);
-			const threadData = data.thread || data.data;
-			// Add new thread to the store
-			store.dispatch({
-				type: "threads/addThread",
-				payload: {
-					...threadData,
-					likesCount: 0,
-					isLiked: false,
-				},
-			});
-			break;
+        case "LIKE_UPDATE": {
+            store.dispatch(updateThread({ 
+                id: data.threadId, 
+                likesCount: data.likesCount 
+            }));
 
-		case "LIKE_UPDATE":
-			console.log("like updating", data);
-			// Update the likes count for the thread
-			store.dispatch({
-				type: "threads/updateThread",
-				payload: { id: data.threadId, likesCount: data.likesCount },
-			});
-			break;
+            // Cek jika user yang sedang login adalah yang melakukan like
+            const state = store.getState();
+            const currentUserId = state.user.user?.id;
+            if (currentUserId && data.userId === currentUserId) {
+                store.dispatch(updateLikeStatusThread({
+                    id: data.threadId,
+                    isLiked: data.liked,
+                    likesCount: data.likesCount,
+                }));
+            }
+            break;
+        }
 
-		case "NEW_REPLY":
-			console.log("reply count updatin", data.data.thread_id);
-			// Update the thread's reply count
-			store.dispatch({
-				type: "threads/updateThread",
-				payload: {
-					id: data.data.thread_id,
-					number_of_replies: data.data.thread_replies_count || 0,
-				},
-			});
+        case "NEW_REPLY": {
+            const { threadId, reply, repliesCount } = data.data;
+            
+            // update jumlah reply di list thread
+            store.dispatch(updateThread({
+                id: threadId,
+                number_of_replies: repliesCount,
+            }));
 
-			const state = store.getState();
-			const currentUserId = state.user.currentUser?.id;
-			if (currentUserId && data.userId === currentUserId) {
-				store.dispatch({
-					type: "threads/updateLikeStatusThread",
-					payload: {
-						id: data.threadId,
-						isLiked: data.liked,
-						likesCount: data.likesCount,
-					},
-				});
-			}
+            // jika ada reply detail/status reply, masukkan ke slice reply (jika ada)
+            if (reply) {
+                store.dispatch({ type: "reply/addReply", payload: reply });
+            }
+            break;
+        }
 
-			// If there's a global callback for like update (e.g., for Status page)
-			if ((window as any).likeUpdateCallback) {
-				(window as any).likeUpdateCallback(data);
-			}
-			break;
-
-		default:
-			console.log("❓ Unhandled WebSocket message type:", data.type);
-	}
+        default:
+            console.log("❓ Unhandled message:", data.type);
+    }
 };
 
 export const disconnect = () => {
-    if(socket){
-        socket.close()
-        socket = null
-    }
-}
+	if (socket) {
+		socket.close();
+		socket = null;
+	}
+};
 
 export const getSocket = () => {
-    return socket 
-}
+	return socket;
+};

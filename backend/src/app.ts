@@ -9,7 +9,8 @@ import userRouteAuth from "./routes/auth";
 import threadRoute from "./routes/thread";
 import likesRoute from "./routes/likes";
 import userRoute from "./routes/user";
-import repliesRoute from "./routes/replies"
+import repliesRoute from "./routes/replies";
+import followRoute from "./routes/follows"
 
 import corsMiddleware from "./middlewares/cors";
 import path from "path";
@@ -31,7 +32,8 @@ console.log("SERVING UPLOADS FROM:", uploadsPath);
 // Routes
 app.use("/api/v1", authRoute, userRouteAuth);
 app.use("/api/v1", threadRoute, likesRoute, userRoute);
-app.use("/api/v1/replies", repliesRoute)
+app.use("/api/v1/replies", repliesRoute);
+app.use("/api/user", followRoute)
 
 // Error handling middleware
 app.use(
@@ -45,7 +47,7 @@ app.use(
 	},
 );
 
-// buat 	HTTP server dari Express
+// buat HTTP server dari Express
 const server = http.createServer(app);
 
 // create socket server
@@ -60,13 +62,15 @@ wss.on("connection", (ws) => {
 
 	ws.on("message", (message) => {
 		try {
-			const payload = JSON.parse(message.toString())
-			if(payload.type === 'auth') {
-				console.log(`user authenticated`)
+			const payload = JSON.parse(message.toString());
+			if (payload.type === "auth") {
+				console.log(`user authenticated`);
 				return;
 			}
 		} catch (error) {
-			console.error(`error processing data`)
+			console.log("📨 Received raw WebSocket message:", message.toString());
+			// Backward compatibility - broadcast raw messages if needed
+			broadcast({ type: "message", data: message.toString() });
 		}
 	});
 

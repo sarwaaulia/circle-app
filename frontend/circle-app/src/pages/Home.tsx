@@ -13,7 +13,7 @@ export default function HomePage() {
 	if (!context) return null;
 
 	const { token } = context;
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<any>();
 	const currentUser = useSelector((state: any) => state.user.currentUser);
 	const { threads, loading, error } = useSelector(
 		(state: any) => state.threads,
@@ -48,9 +48,9 @@ export default function HomePage() {
 	}
 
 	return (
-		<div className="flex-1 ml-64 mr-80 border-l border-r border-neutral-800 min-h-screen">
+		<div className="flex-1 ml-64 mr-80 border-l border-r border-neutral-800">
 			{/* Header */}
-			<header className="px-4 py-4 border-b border-neutral-800 sticky top-0 bg-zinc-850 backdrop-blur-md z-10">
+			<header className="px-4 py-4 border-b border-neutral-800 sticky top-0 bg-zinc-850 backdrop-blur-md">
 				<h2 className="font-bold text-lg text-white">Home</h2>
 			</header>
 
@@ -64,9 +64,7 @@ export default function HomePage() {
 				isOnThreadCreate={(newThread) =>
 					dispatch({
 						type: "threads/addThread",
-						payload: newThread,
-						likesCount: 0,
-						isLiked: false,
+						payload: { ...newThread, likesCount: 0, isLiked: false }
 					})
 				}
 			/>

@@ -26,7 +26,7 @@ export default function ThreadCard({
   thread: Thread;
   toggleLike?: (threadId: number, hasLiked: boolean) => Promise<void>;
   onReplyClick?: (threadId: number) => void;
-  from?: "home";
+  from?: "home" | "profile";
 }) {
 const navigate = useNavigate();
 if(!thread) return null;
@@ -68,7 +68,10 @@ if(!thread) return null;
 
           {/* Like Button */}
           <div
-             onClick={() => toggleLike?.(thread.id, thread.isLiked ?? false)}
+             onClick={(e) => {
+              e.stopPropagation();
+              toggleLike?.(thread.id, thread.isLiked ?? false);
+             }}
              className={`
              flex items-center gap-2 cursor-pointer transition
             hover:text-red-400

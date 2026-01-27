@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux";
 import ReplyCard from "./CardReply";
 import type { Reply } from "@/types/Reply";
 
@@ -8,10 +9,16 @@ interface ThreadUser {
   photo_profile?: string;
 }
 
-export default function ReplyList({ replies, threadUser }: { replies: Reply[]; threadUser: ThreadUser }) {
-  if (replies.length === 0) {
+export default function ReplyList({ threadUser }: { threadUser: ThreadUser }) {
+  
+  const replies: Reply[] = useSelector(
+    (state: any) => state.replies.replies
+  );
+  console.log("REPLIES FROM REDUX:", replies);
+
+  if (!replies || replies.length === 0) {
     return (
-      <div className="py-8 text-center text-gray-500">
+      <div className="py-8 text-center text-gray-400">
         No reply yet. Be the first to reply!
       </div>
     );

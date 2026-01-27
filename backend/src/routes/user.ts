@@ -1,10 +1,8 @@
 import express from "express";
-import { authenticate } from '../middlewares/userAuth';
-import threadController from '../controllers/thread';
+import { authenticate } from "../middlewares/userAuth";
+import upload from "../utils/multer";
+import prisma from "../prisma/client";
 
-const router = express.Router()
-
-// thread by user 
-router.get("/user/:userId", authenticate, threadController.getThreadsByUser)
+const router = express.Router();
 
 export default router;

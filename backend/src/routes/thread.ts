@@ -21,7 +21,7 @@ router.get("/:id", authenticate, threadController.getThreadById);
 router.post(
 	"/threads",
 	authenticate,
-	upload.single("image"),
+	upload.any(),
 	threadController.createThread,
 );
 
@@ -37,5 +37,8 @@ router.patch(
 
 // delete thread (protected)
 router.delete("/:id", authenticate, threadController.deleteThread);
+
+// thread by user 
+router.get("/user/:userId", authenticate, threadController.getThreadsByUser)
 
 export default router;

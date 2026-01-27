@@ -21,17 +21,27 @@ export interface UpdateReplyThread {
 class ThreadReply {
   // Create a new reply
   async create(data: CreateReplyThread) {
-    return await prisma.reply.create({
-      data: {
-        content: data.content,
-        image: data.image,
-        userId: data.userId,
-        threadId: data.threadId,
-        created_by: data.created_by,
-        updated_by: data.updated_by,
+  return await prisma.reply.create({
+    data: {
+      content: data.content,
+      image: data.image,
+      userId: data.userId,
+      threadId: data.threadId,
+      created_by: data.created_by,
+      updated_by: data.updated_by,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          full_name: true,
+          photo_profile: true,
+        },
       },
-    });
-  }
+    },
+  });
+}
 
   //  get all rep & user info dari spesifik thread id 
   async findByThreadId(threadId: number) {

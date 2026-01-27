@@ -9,7 +9,7 @@ export default function ThreadList({
   toggleLike?: (threadId: number, hasLiked: boolean) => Promise<void>;
 }) {
   return (
-    <div className="w-full">
+    <div className="">
       {threads.map(thread => (
         <ThreadCard key={thread.id ?? `${thread.createdAt}-${thread.content}`} thread={thread} toggleLike={toggleLike} />
       ))}

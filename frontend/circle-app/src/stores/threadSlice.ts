@@ -16,29 +16,26 @@ const initialState: ThreadState = {
 };
 
 // fetch threads menggunakan async thunk
-export const fetchThreads = createAsyncThunk(
-	"threads/fetchAll",
-	async () => {
-		try {
-			const response = await fetch("http://localhost:9000/api/v1/threads", {
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
-				},
-				credentials: "include",
-			});
+export const fetchThreads = createAsyncThunk("threads/fetchAll", async () => {
+	try {
+		const response = await fetch("http://localhost:9000/api/v1/threads", {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+			credentials: "include",
+		});
 
-			if (!response.ok) {
-				throw new Error("Failed to fetch threads");
-			}
-
-			const data = await response.json();
-			return data.data || [];
-		} catch (error) {
-			console.error("Error in fetchThreads:", error);
-			throw error;
+		if (!response.ok) {
+			throw new Error("Failed to fetch threads");
 		}
-	},
-);
+
+		const data = await response.json();
+		return data.data || [];
+	} catch (error) {
+		console.error("Error in fetchThreads:", error);
+		throw error;
+	}
+});
 
 export const fetchThreadId = createAsyncThunk(
 	"threads/fetchId",
@@ -65,7 +62,13 @@ export const fetchThreadId = createAsyncThunk(
 
 export const toggleLike = createAsyncThunk(
 	"threads/toggleLike",
-	async ({ threadId, currentIsLiked }: { threadId: number; currentIsLiked: boolean; }) => {
+	async ({
+		threadId,
+		currentIsLiked,
+	}: {
+		threadId: number;
+		currentIsLiked: boolean;
+	}) => {
 		try {
 			const response = await fetch(
 				`http://localhost:9000/api/v1/${threadId}/thread/like`,
@@ -108,26 +111,29 @@ export const toggleLike = createAsyncThunk(
 const threadSlice = createSlice({
 	name: "threads",
 	initialState,
-	// untuk perubahan state lokal
 	reducers: {
 		addThread: (state, action: PayloadAction<Thread>) => {
-			if (state.threads.some((t) => t.id === action.payload.id)) {
-				// unshift agar thread yang baru di post barada di atas
-				state.threads.unshift(action.payload);
+			const newThread = action.payload
+			const isExist = state.threads.find((t) => t.id === newThread.id)
+
+			if(!isExist){
+				state.threads = [newThread, ...state.threads]
 			}
 		},
-		// cari state berdasarkan id dan dengan data baru
-		updateThread: (state, action: PayloadAction<Thread>) => {
+
+		updateThread: (state, action: PayloadAction<Partial<Thread> & { id: number }>) => {
 			const index = state.threads.findIndex(
 				(thread) => thread.id === action.payload.id,
 			);
 			if (index !== -1) {
 				state.threads[index] = {
 					...state.threads[index],
+					// menggabungkan perubahan
 					...action.payload,
 				};
 			}
 		},
+
 		updateLikeStatusThread: (
 			state,
 			action: PayloadAction<{
@@ -144,18 +150,18 @@ const threadSlice = createSlice({
 				state.threads[index].likesCount = action.payload.likesCount;
 			}
 		},
+
 		clearThreads: (state) => {
 			state.threads = [];
 		},
 	},
-	extraReducers(builder) {
+
+	extraReducers: (builder) => {
 		builder
-			// mulai ambil data
 			.addCase(fetchThreads.pending, (state) => {
 				state.loading = true;
 				state.error = null;
 			})
-			// data data dan data threads terisi
 			.addCase(fetchThreads.fulfilled, (state, action) => {
 				state.loading = false;
 				state.threads = action.payload;
@@ -164,24 +170,16 @@ const threadSlice = createSlice({
 				state.loading = false;
 				state.error = action.error.message || "Failed to fetch threads";
 			})
-			// after server confirm like, maka mencari thread yang di like untuk di konfirm yang bertambah
-			.addCase(toggleLike.pending, (state) => {
-				state.error = null;
-			})
 			.addCase(toggleLike.fulfilled, (state, action) => {
-				const { threadId, isLiked, likesCount } = action.payload!;
+				if (!action.payload) return;
+				const { threadId, isLiked, likesCount } = action.payload;
 				const index = state.threads.findIndex(
 					(thread) => thread.id === threadId,
 				);
 				if (index !== -1) {
-					// Always update with server data
 					state.threads[index].isLiked = isLiked;
 					state.threads[index].likesCount = likesCount;
 				}
-			})
-			.addCase(toggleLike.rejected, (state, action) => {
-				state.error = action.error.message || "Failed to toggle like";
-				// TODO: Revert optimistic update on error
 			})
 			.addCase(fetchThreadId.fulfilled, (state, action) => {
 				const fetchedThread = action.payload;
@@ -195,17 +193,18 @@ const threadSlice = createSlice({
 						...fetchedThread,
 					};
 				} else {
-					// Add new thread if not in state
 					state.threads.unshift(fetchedThread);
 				}
 			});
-        },
-    });
+	},
+});
 
+export const { addThread, updateThread, updateLikeStatusThread, clearThreads } =
+	threadSlice.actions;
 
-export const { addThread, updateThread, updateLikeStatusThread, clearThreads } = threadSlice.actions;
-
-export const selectThreads = (state: { threads: ThreadState }) => state.threads.threads;
-export const getThreadById = (state: { threads: ThreadState }, id: number) => state.threads.threads.find(thread => thread.id === id);
+export const selectThreads = (state: { threads: ThreadState }) =>
+	state.threads.threads;
+export const getThreadById = (state: { threads: ThreadState }, id: number) =>
+	state.threads.threads.find((thread) => thread.id === id);
 
 export default threadSlice.reducer;

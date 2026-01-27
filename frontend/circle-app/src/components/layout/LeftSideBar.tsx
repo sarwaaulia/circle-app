@@ -53,7 +53,7 @@ export default function LeftSidebar() {
 						<Link
 							key={item.href}
 							to={item.href}
-							className={`flex items-center gap-3 px-4 py-2 rounded-xl transition hover:bg-blue-900 ${
+							className={`flex items-center gap-3 px-4 py-2 rounded-xl transition text-zinc-300 hover:bg-blue-900 ${
 								active ? "bg-blue-700" : ""
 							}`}
 						>
@@ -65,7 +65,7 @@ export default function LeftSidebar() {
 			</nav>
 
 			<label
-				className="mt-4 cursor-pointer bg-white text-blue-950 hover:bg-blue-800 font-semibold text-lg py-1 rounded-2xl text-center "
+				className="mt-4 cursor-pointer bg-blue-700 text-zinc-300 hover:bg-blue-900 font-semibold text-lg py-1 rounded-3xl text-center"
 				onClick={handleCreateThread}
 			>
 				Create Post
@@ -74,7 +74,7 @@ export default function LeftSidebar() {
 			<div className="mt-auto">
 				<Button
 					variant="destructive"
-					className="w-full flex items-center gap-2"
+					className="w-full flex items-center font-semibold text-zinc-500 gap-2 bg-white hover:bg-blue-900 rounded-3xl cursor-pointer"
 					onClick={handleLogout}
 				>
 					<LogOut size={19} /> Logout

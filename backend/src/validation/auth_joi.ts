@@ -12,6 +12,12 @@ export const loginSchema = Joi.object({
     password: Joi.string().min(6).required(),
 })
 
+export const updateUserSchema = Joi.object({
+    full_name: Joi.string().optional(),
+    username: Joi.string().min(1).max(50).optional(),
+    bio: Joi.string().max(500).optional()
+});
+
 export const createThreadSchema = Joi.object({
     content: Joi.string().required()
 })

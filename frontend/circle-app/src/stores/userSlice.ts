@@ -21,21 +21,27 @@ const userSlice = createSlice({
 	name: "user",
 	initialState,
 	reducers: {
-		setAuth: (state, action: PayloadAction<{ user: Partial<User>; token: string }>) => {
+		setAuth: (
+			state,
+			action: PayloadAction<{ user: Partial<User>; token: string }>,
+		) => {
 			state.user = {
-        ...state.user,
-        ...action.payload.user,
-      };
-      state.currentUser = {
-        ...state.currentUser,
-        ...action.payload.user,
-      };
-      if (action.payload.token) {
-        state.token = action.payload.token;
-        localStorage.setItem("token", action.payload.token);
-      }
-      state.isAuthenticated = true;
-    },
+				...state.user,
+				...action.payload.user,
+			};
+			state.currentUser = {
+				...state.currentUser,
+				...action.payload.user,
+			};
+			if (action.payload.token) {
+				state.token = action.payload.token;
+				localStorage.setItem("token", action.payload.token);
+			}
+			state.isAuthenticated = true;
+
+			// userSlice.ts
+			const savedUser = localStorage.getItem("currentUser");
+		},
 
 		logout: (state) => {
 			state.currentUser = null;
@@ -44,8 +50,7 @@ const userSlice = createSlice({
 			localStorage.removeItem("token");
 		},
 
-    incrementFollowing: (state) => {
-    },
+		incrementFollowing: (state) => {},
 	},
 });
 
