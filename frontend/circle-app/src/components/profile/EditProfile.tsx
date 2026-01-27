@@ -72,10 +72,6 @@ export default function EditProfile({ onClose }: { onClose?: () => void }) {
       // Normalisasi user baru
       const normalized = { ...user, ...result.user, id: result.user.id };
 
-// Hapus baris ini, karena bikin id undefined
-// normalized.id = normalized.user_id;
-// delete normalized.user_id;
-
 dispatch(setAuth({ user: normalized, token: token || '' }));
 
       onClose?.();

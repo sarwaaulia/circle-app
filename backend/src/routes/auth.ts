@@ -11,7 +11,6 @@ router.post("/register", upload.single("photo_profile"), handleRegister)
 
 router.post("/login", handleLogin)
 
-
 // user
 router.get("/me", corsMiddleware, authenticate, async (req, res) => {
     const {user} = req as any;
@@ -44,8 +43,8 @@ router.get("/me", corsMiddleware, authenticate, async (req, res) => {
 })
 
 router.put("/user", authenticate, upload.fields([
-    {name: 'photo_profile'},
-    {name: 'header'}
+    {name: 'photo_profile', maxCount: 1},
+    {name: 'header', maxCount: 1}
 ]), handleUpdateUser)
 
 export default router

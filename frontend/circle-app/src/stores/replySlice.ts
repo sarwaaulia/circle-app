@@ -17,7 +17,7 @@ const initialState: RepliesState = {
 // fetch replies by thread
 export const fetchThreadReply = createAsyncThunk(
 	"replies/fetchByThread",
-	async (threadId: string) => {
+	async (threadId: number) => {
 		const response = await fetch(
 			`http://localhost:9000/api/v1/replies/thread/${threadId}`,
 			{
@@ -52,6 +52,7 @@ export const toggleReplyLike = createAsyncThunk(
 					Authorization: `Bearer ${localStorage.getItem("token")}`,
 					"Content-Type": "application/json",
 				},
+				body: JSON.stringify({ replyId: replyId }),
 			},
 		);
 		if (!response.ok) {
@@ -101,7 +102,21 @@ const replySlice = createSlice({
 			.addCase(toggleReplyLike.pending, (state) => {
 				state.error = null;
 			})
-			.addCase(toggleReplyLike.fulfilled, (state, action) => {})
+			.addCase(toggleReplyLike.fulfilled, (state, action) => {
+				const {replyId} = action.payload
+				const replyExist = state.replies.find((reply) => reply.id === replyId)
+
+				if(replyExist) {
+					const currentCount = replyExist.likesCount ?? 0
+					if(replyExist.isLiked) {
+						replyExist.isLiked = false
+						replyExist.likesCount =	 Math.max(0, currentCount - 1);
+					} else {
+						replyExist.isLiked = true
+						replyExist.likesCount = currentCount + 1;
+					}
+				}
+			})
 			.addCase(toggleReplyLike.rejected, (state, action) => {
 				state.error = action.error.message || "Failed to toggle like";
 			});

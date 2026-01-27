@@ -11,7 +11,7 @@ export default function ProfileModal({ open, onClose, children }: ProfileModalPr
 
   const modal = (
     <div className="fixed inset-0 bg-black/50 flex items-start justify-center pt-24">
-      <div className="bg-blue-300 rounded-xl p-4 w-full max-w-lg relative">
+      <div className="bg-blue-700 rounded-xl p-4 w-full max-w-lg relative">
 
         {/* CLOSE BUTTON */}
         <button

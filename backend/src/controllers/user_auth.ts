@@ -70,8 +70,8 @@ export async function handleUpdateUser(req: Request, res: Response) {
     const authUser = (req as any).user;
     const { full_name, username, bio } = req.body;
     const files = (req as any).files;
-    const photo_profile = files?.photo_profile ? files.photo_profile[0].filename : undefined;
-    const header = files?.header ? files.header[0].filename : undefined;
+    const photo_profile = files && files['photo_profile'] ? files['photo_profile'][0].filename : undefined;
+    const header = files && files['header'] ? files['header'][0].filename : undefined;
 
     // check username uniqueness
     if (username && username !== authUser.username) {
@@ -81,12 +81,12 @@ export async function handleUpdateUser(req: Request, res: Response) {
       }
     }
 
-    const updateData: any = { updated_by: authUser.username };
+    const updateData: any = {};
     if (full_name !== undefined) updateData.full_name = full_name.trim();
     if (username !== undefined) updateData.username = username.trim();
     if (bio !== undefined) updateData.bio = bio.trim();
     if (photo_profile !== undefined) updateData.photo_profile = photo_profile;
-    if (header !== undefined) updateData.header = header;
+    if (header !== undefined) updateData.header = header; 
 
     const updatedUser = await prisma.user.update({
       where: { id: authUser.id },

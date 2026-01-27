@@ -1,5 +1,7 @@
 import { Heart } from "lucide-react";
 import type { Reply } from "@/types/Reply";
+import { toggleReplyLike } from "@/stores/replySlice";
+import { useDispatch } from "react-redux";
 
 interface ThreadUser {
 	id: number;
@@ -15,6 +17,18 @@ export default function ReplyCard({
 	reply: Reply;
 	threadUser: ThreadUser;
 }) {
+	const dispatch = useDispatch<any>();
+	const handleLike = (e: React.MouseEvent) => {
+		// agar ketika user klik like, form nya tidak ke trigger
+		e.stopPropagation();
+
+		dispatch(
+			toggleReplyLike({
+				replyId: Number(reply.id),
+				currentIsLiked: !!reply.isLiked,
+			}),
+		);
+	};
 	return (
 		<div className="">
 			<div>
@@ -47,19 +61,9 @@ export default function ReplyCard({
 					/>
 				)}
 
-				<div className="flex gap-6 mt-3 text-gray-400">
-					<div
-						className={`flex items-center gap-2 cursor-pointer transition hover:text-red-400 ${
-							reply.isLiked ? "text-red-500" : "text-gray-400"
-						}`}
-					>
-						<Heart
-							size={18}
-							fill={reply.isLiked ? "red" : "none"}
-							strokeWidth={reply.isLiked ? 0 : 2}
-						/>
-						<span>{reply.likesCount || 0}</span>
-					</div>
+				<div onClick={handleLike} className="cursor-pointer">
+					<Heart fill={reply.isLiked ? "red" : "none"} />
+					<span>{reply.likesCount}</span>
 				</div>
 			</div>
 		</div>

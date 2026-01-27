@@ -28,9 +28,7 @@ export const connect = (token: string) => {
 	socket.onmessage = (event) => {
 		try {
 			const rawData = JSON.parse(event.data);
-
-			// Cek jika data yang diterima masih berupa string (nested JSON)
-			// Seperti yang terlihat di console : data: '{"type":"auth", ...}'
+            
 			let finalData = rawData;
 			if (typeof rawData.data === "string") {
 				finalData = JSON.parse(rawData.data);

@@ -231,6 +231,101 @@ export const toggleFollow = async (req: Request, res: Response) => {
 			},
 		});
 	} catch (error) {
-        return res.status(500).json({message: `internal server error`})
+		return res.status(500).json({ message: `internal server error` });
+	}
+};
+
+export const searchUser = async (req: Request, res: Response) => {
+	try {
+		const { q } = req.query;
+		const authUser = (req as any).user;
+
+		if (!q || typeof q !== "string" || q.trim().length < 1) {
+			return res.status(400).json({ message: `search query is required` });
+		}
+
+		const query = q.trim();
+		const users = await prisma.user.findMany({
+			where: {
+				AND: [
+					{ id: { not: authUser.id } },
+					{
+						OR: [
+							{
+								username: {
+									contains: query,
+									mode: "insensitive",
+								},
+							},
+							{
+								full_name: {
+									contains: query,
+									mode: "insensitive",
+								},
+							},
+						],
+					},
+				],
+			},
+			select: {
+				id: true,
+				username: true,
+				full_name: true,
+				photo_profile: true,
+				bio: true
+			},
+			take: 3
+		});
+		return res.status(200).json({
+			message: `success search user`,
+			data: users
+		})
+	} catch (error: any) {
+		console.error(`cannot search user`, error)
+		return res.status(500).json({message: 'internal server error'})
+	}
+};
+
+export const getUserById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const userId = Number(id);
+
+        if (isNaN(userId)) {
+            return res.status(400).json({ 
+                status: "error",
+                message: "Invalid user ID" 
+            });
+        }
+
+        const userData = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                username: true,
+                full_name: true,
+                photo_profile: true,
+                bio: true,
+            }
+        });
+
+        if (!userData) {
+            return res.status(404).json({ 
+                status: "error",
+                message: "User not found" 
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "User profile found",
+            user: userData
+        });
+    } catch (error: any) {
+        return res.status(500).json({ 
+            status: "error",
+            message: "Internal server error",
+            error: error.message 
+        });
     }
 };

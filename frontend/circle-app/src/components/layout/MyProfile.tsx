@@ -128,18 +128,18 @@ export function ProfileCard() {
 
 	const headerSrc = user?.header
 		? `http://localhost:9000/uploads/${user.header}`
-		: "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
+		: "https://cdn.pixabay.com/photo/2025/08/29/11/16/norway-9803687__480.jpg";
 
 	const profileSrc = user?.photo_profile
 		? `http://localhost:9000/uploads/${user.photo_profile}`
-		: "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
+		: "https://pixabay.com/vectors/flower-ornament-frame-border-4634053/";
 
 	const debug = useSelector((state: any) => state.user);
 	console.log("DEBUG USER:", debug);
 
 	return (
 		<>
-			<div className="bg-blue-700 rounded-lg overflow-hidden shadow-lg w-full">
+			<div className="bg-blue-800 rounded-lg overflow-hidden shadow-lg w-full">
 				<div className="px-2 pt-2 pb-1 sm:px-3 sm:pt-1 sm:pb-2">
 					<h2 className="text-zinc-300 font-semibold text-xs sm:text-sm">
 						My Profile
@@ -147,7 +147,7 @@ export function ProfileCard() {
 				</div>
 
 				{/* Header */}
-				<div className="relative mx-2 sm:mx-3 h-16 sm:h-20 rounded-lg">
+				<div className="relative sm:mx-3 h-16 sm:h-20 rounded-lg">
 					<img
 						src={headerSrc}
 						className="w-full h-full object-cover rounded-lg"
@@ -176,7 +176,7 @@ export function ProfileCard() {
 
 				{/* User Info */}
 				<div className="px-2 sm:px-3 pb-2 sm:pb-3">
-					<h3 className="font-bold text-blue-950 text-xs sm:text-sm">
+					<h3 className="font-semibold text-zinc-300 text-xs sm:text-sm mt-1">
 						{user?.full_name || "Name"}
 					</h3>
 

@@ -19,4 +19,8 @@ router.get("/suggest/:userId", authenticate, followController.suggestUser);
 
 router.post("/follow/:followingId", authenticate, followController.toggleFollow);
 
+router.get("/search", authenticate, followController.searchUser)
+
+router.get("/:id", authenticate, followController.getUserById)
+
 export default router;

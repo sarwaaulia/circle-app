@@ -59,13 +59,13 @@ export default function FollowersFollowingModal({ isOpen, onClose, type, userId,
 
         const followingIds = new Set(followingList.map(u => u.id));
 
-        // Mark users as followed if they are in our following list
+        // mark users as followed if they are in our following list
         usersList = usersList.map(user => ({
           ...user,
           isFollowing: followingIds.has(user.id)
         }));
       } else if (type === 'following') {
-        // For following list, we are following all of them
+        // for following list, we are following all of them
         usersList = usersList.map(user => ({ ...user, isFollowing: true }));
       }
 
@@ -136,10 +136,10 @@ export default function FollowersFollowingModal({ isOpen, onClose, type, userId,
             u.id === targetUserId ? { ...u, isFollowing: false } : u
           ));
         }
-        // Notify parent component that following changed
+        // notif parent component that following changed
         onFollowingChanged?.();
 
-        // Dispatch real-time event for following count update
+        // dispatch real-time event for following count update
         window.dispatchEvent(new CustomEvent('currentUserFollowingChange', {
           detail: { action: 'decrement' }
         }));
