@@ -95,6 +95,7 @@ export default function SearchBar() {
 		};
 	}, []);
 
+	// main logic
 	const handleSearch = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -198,6 +199,22 @@ export default function SearchBar() {
 			} else {
 				console.error("Failed to follow user");
 			}
+			if (response.ok) {
+				// Update status di list utama DAN suggestions agar sinkron
+				const updateList = (list: SearchUser[]) =>
+					list.map((u) =>
+						u.id === targetUserId ? { ...u, isFollowing: true } : u,
+					);
+
+				setUsers((prev) => updateList(prev));
+				setSuggestions((prev) => updateList(prev));
+
+				window.dispatchEvent(
+					new CustomEvent("currentUserFollowingChange", {
+						detail: { action: "increment" },
+					}),
+				);
+			}
 		} catch (error) {
 			console.error("Error following user:", error);
 		}
@@ -216,10 +233,10 @@ export default function SearchBar() {
 			<div className="flex items-center gap-4 mb-6">
 				<ArrowLeft
 					size={24}
-					className="cursor-pointer hover:text-blue-600 transition-colors"
+					className="cursor-pointer hover:text-blue-700 transition-colors"
 					onClick={() => navigate("/")}
 				/>
-				<h1 className="text-2xl font-bold text-blue-950">Search Users</h1>
+				<h1 className="text-2xl font-bold text-blue-700">Search Users</h1>
 			</div>
 
 			{/* Search Form */}

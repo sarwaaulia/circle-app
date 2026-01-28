@@ -21,6 +21,7 @@ import ThreadDetailPage from "./pages/ThreadDetail";
 import ProfilePage from "./pages/ProfilePage";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "./pages/SearchBar";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function AppWrapper() {
 	const [authCheck, setAuthCheck] = useState(true);
@@ -109,6 +110,7 @@ function AppWrapper() {
 							<Route path="/threads/:threadId" element={<ThreadDetailPage />} />
 							<Route path="/search" element={<SearchBar/>}/>
 							<Route path="/profile/:userId" element={<ProfilePage />} />
+							<Route path="/forgot_password" element={<ForgotPassword/>}/>
 						</Routes>
 					</main>
 

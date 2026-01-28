@@ -78,11 +78,19 @@ export default function ThreadCard({
 					{thread.content}
 				</p>
 
-				{thread.image && (
-					<img
-						src={`http://localhost:9002/uploads/${thread.image}`}
-						className="rounded-xl mt-2 mb-3 max-h-96 w-full object-cover"
-					/>
+				{Array.isArray(thread.image) && thread.image.length > 0 && (
+					<div
+						className={`mt-2 mb-3 grid gap-2 ${thread.image.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}
+					>
+						{thread.image.map((img, idx) => (
+							<img
+								key={idx}
+								src={`http://localhost:9002/uploads/${img}`}
+								className="rounded-xl max-h-60 w-full object-cover border border-gray-800"
+								onError={(e) => (e.currentTarget.style.display = "none")}
+							/>
+						))}
+					</div>
 				)}
 
 				{/* Actions */}

@@ -34,7 +34,7 @@ export default function ReplyInput({
 	const handleSubmit = async () => {
 		if (!content.trim() && !image) return;
 		setIsSubmitting(true);
-		
+
 		try {
 			await onReplySubmit(content, image || undefined);
 			setContent("");
@@ -78,11 +78,11 @@ export default function ReplyInput({
 				/>
 
 				{imagePreview && (
-					<div className="relative mt-2 inline-block">
+					<div className="relative mt-2">
 						<img
 							src={imagePreview}
 							alt="Preview"
-							className="rounded-lg max-h-40 object-cover"
+							className="rounded-xl max-h-96 w-full object-cover"
 						/>
 						<button
 							onClick={removeImage}

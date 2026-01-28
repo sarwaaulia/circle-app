@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heart, MessageCircle } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleReplyLike, addReply } from "@/stores/replySlice";
@@ -53,6 +53,12 @@ export default function ThreadDetailModal({
 	const [replySubmitting, setReplySubmitting] = useState(false);
 
 	const BASE_URL = "http://localhost:9002/uploads/";
+
+	useEffect(() => {
+        if (isOpen) document.body.style.overflow = "hidden";
+        else document.body.style.overflow = "unset";
+        return () => { document.body.style.overflow = "unset"; };
+    }, [isOpen])
 
 	if (!isOpen || !thread || !profileUser) return null;
 
@@ -138,148 +144,115 @@ export default function ThreadDetailModal({
 
 	return (
 		<div
-			className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+			className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[100] p-4"
 			onClick={onClose}
 		>
 			<div
-				className="bg-white w-[90vw] h-[90vh] max-w-5xl rounded-xl overflow-hidden flex relative"
+				className="bg-white w-full max-w-6xl h-[90vh] rounded-2xl overflow-hidden flex shadow-2xl relative"
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* CLOSE BUTTON */}
 				<button
-					className="absolute right-4 top-4 w-10 h-10 flex items-center justify-center
-               bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-full
-               text-gray-700 hover:text-black text-xl font-bold
-               transition-all cursor-pointer z-10 shadow-lg"
+					className="absolute right-4 top-4 z-20 p-2 bg-black/10 hover:bg-black/20 rounded-full transition-colors"
 					onClick={onClose}
 				>
 					✕
 				</button>
 
 				{/* LEFT SIDE — IMAGE */}
-				<div className="w-1/2 bg-black">
-					<img
-						src={`${BASE_URL}${thread.images?.[0]}`}
-						alt="Thread"
-						className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-						onClick={onToggleImagePopup}
-					/>
-				</div>
+				<div className="hidden md:flex md:w-3/5 bg-neutral-950 items-center justify-center border-r">
+                    <img
+                        src={`${BASE_URL}${thread.images?.[0]}`}
+                        alt="Thread"
+                        className="max-w-full max-h-full object-contain cursor-zoom-in"
+                        onClick={onToggleImagePopup}
+                    />
+                </div>
 
 				{/* RIGHT SIDE — DETAILS + COMMENTS */}
-				<div className="w-1/2 flex flex-col bg-white">
-					{/* USER INFO - User Avatar, Name, Username */}
-					<div className="p-4 bg-white border-b">
-						<div className="flex items-center gap-3">
-							<img
-								src={
-									profileUser.photo_profile
-										? `${BASE_URL}${profileUser.photo_profile}`
-										: "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
-								}
-								className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-								alt={profileUser.full_name}
-							/>
-							<div className="flex-1">
-								<div className="font-semibold text-blue-950 text-sm">
-									{profileUser.full_name}
-								</div>
-								<div className="text-xs text-gray-600">
-									@{profileUser.username}
-								</div>
-							</div>
-						</div>
-					</div>
+				<div className="w-full md:w-2/5 flex flex-col h-full bg-white text-slate-900">
+                    {/* HEADER */}
+                    <div className="p-4 border-b flex items-center gap-3">
+                        <img
+                            src={profileUser.photo_profile ? `${BASE_URL}${profileUser.photo_profile}` : "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"}
+                            className="w-10 h-10 rounded-full object-cover ring-1 ring-gray-100"
+                            alt={profileUser.username}
+                        />
+                        <div>
+                            <p className="font-bold text-sm leading-tight">{profileUser.full_name}</p>
+                            <p className="text-xs text-gray-500">@{profileUser.username}</p>
+                        </div>
+                    </div>
 
-					{/* THREAD CONTENT */}
-					<div className="p-4 border-b">
-						<p className="text-gray-900 text-sm leading-relaxed mb-3 whitespace-pre-line">
-							{thread.content}
-						</p>
+                    {/* SCROLLABLE AREA */}
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                        {/* Konten Utama Thread */}
+                        <div className="p-4 border-b bg-slate-50/50">
+                            <p className="text-[15px] leading-normal mb-3 whitespace-pre-wrap">
+                                {thread.content}
+                            </p>
+                            <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                                {new Date(thread.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · {new Date(thread.created_at).toLocaleDateString()}
+                            </span>
+                        </div>
 
-						<div className="flex items-center justify-between text-xs text-gray-500">
-							<div>
-								{new Date(thread.created_at).toLocaleTimeString("en-US", {
-									hour: "numeric",
-									minute: "2-digit",
-								})}{" "}
-								·{" "}
-								{new Date(thread.created_at).toLocaleDateString("en-US", {
-									month: "short",
-									day: "numeric",
-									year: "numeric",
-								})}
-							</div>
-						</div>
-					</div>
+                        {/* List Komentar */}
+                        <div className="divide-y divide-gray-50">
+                            {replies.length > 0 ? (
+                                replies.map((reply: any) => (
+                                    <ReplyCard
+                                        key={reply.id}
+                                        reply={reply}
+                                        threadUser={{
+                                            id: profileUser.id, // FIX: Gunakan profileUser.id, bukan thread.id
+                                            full_name: profileUser.full_name,
+                                            username: profileUser.username,
+                                            photo_profile: profileUser.photo_profile || undefined,
+                                        }}
+                                        toggleLike={handleToggleReplyLike}
+                                    />
+                                ))
+                            ) : (
+                                <div className="p-10 text-center text-gray-400 text-sm italic">
+                                    No replies yet. Be the first to reply!
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-					{/* REPLIES LIST */}
-					<div className="flex-1 overflow-y-auto p-4">
-						{replies.map((reply: any) => (
-							<ReplyCard
-								key={reply.id}
-								reply={reply}
-								threadUser={{
-									id: thread.id,
-									full_name: profileUser.full_name,
-									username: profileUser.username,
-									photo_profile: profileUser.photo_profile || undefined,
-								}}
-								toggleLike={handleToggleReplyLike}
-							/>
-						))}
-					</div>
+                    {/* FOOTER: ACTION & INPUT */}
+                    <div className="p-4 border-t shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+                        <div className="flex items-center gap-5 mb-4 px-1">
+                            <button 
+                                onClick={() => onToggleLike(thread.id, thread.isLiked || false)}
+                                className={`flex items-center gap-1.5 transition ${thread.isLiked ? "text-rose-500" : "text-gray-500 hover:text-rose-500"}`}
+                            >
+                                <Heart size={20} className={thread.isLiked ? "fill-current" : ""} />
+                                <span className="text-sm font-semibold">{thread.likesCount || 0}</span>
+                            </button>
+                            <div className="flex items-center gap-1.5 text-gray-500">
+                                <MessageCircle size={20} />
+                                <span className="text-sm font-semibold">{thread.repliesCount || 0}</span>
+                            </div>
+                        </div>
 
-					{/* ACTION BAR*/}
-					<div className="p-4 border-t bg-white">
-						<div className="flex items-center justify-between mb-3">
-							<div className="flex items-center gap-6">
-								<button
-									onClick={(e) => {
-										e.stopPropagation();
-										handleToggleThreadLike(thread.id, thread.isLiked || false);
-									}}
-									className={`cursor-pointer pointer-events-auto flex items-center gap-2 text-xs font-medium transition-colors ${
-										thread.isLiked
-											? "text-red-500"
-											: "text-gray-500 hover:text-red-500"
-									}`}
-								>
-									<Heart
-										size={16}
-										className={thread.isLiked ? "fill-current" : ""}
-									/>
-									{thread.likesCount || 0}
-								</button>
-
-								<button
-									onClick={(e) => e.stopPropagation()}
-									className="cursor-pointer flex items-center gap-2 text-xs font-medium text-gray-500 hover:text-blue-500"
-								>
-									<MessageCircle size={16} />
-									{thread.repliesCount || 0}
-								</button>
-							</div>
-						</div>
-
-						{/* REPLY INPUT */}
-						<div className="flex gap-2">
-							<input
-								value={replyContent}
-								onChange={(e) => setReplyContent(e.target.value)}
-								type="text"
-								placeholder="Write a reply..."
-								className="flex-1 border rounded-full px-3 py-2 text-sm"
-							/>
-							<button
-								onClick={() => handleReplySubmit(replyContent)}
-								disabled={replySubmitting || !replyContent.trim()}
-								className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm disabled:opacity-50 hover:bg-blue-400 transition"
-							>
-								{replySubmitting ? "Replying..." : "Reply"}
-							</button>
-						</div>
-					</div>
+                        <div className="flex gap-2 items-end">
+                            <textarea
+                                value={replyContent}
+                                onChange={(e) => setReplyContent(e.target.value)}
+                                placeholder="Post your reply"
+                                className="flex-1 bg-gray-100 focus:bg-white border-none focus:ring-2 focus:ring-blue-500 rounded-2xl px-4 py-2 text-sm outline-none resize-none min-h-[40px] max-h-[120px] transition-all"
+                                rows={1}
+                            />
+                            <button
+                                onClick={() => handleReplySubmit(replyContent)}
+                                disabled={replySubmitting || !replyContent.trim()}
+                                className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-5 py-2 rounded-full text-sm font-bold transition-all transform active:scale-95"
+                            >
+                                {replySubmitting ? "..." : "Reply"}
+                            </button>
+                        </div>
+                    </div>	
 				</div>
 			</div>
 		</div>

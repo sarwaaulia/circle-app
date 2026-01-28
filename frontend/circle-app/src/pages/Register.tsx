@@ -3,12 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Register() {
 	const [username, setUsername] = useState("");
@@ -24,19 +19,16 @@ export default function Register() {
 		setMsg("");
 
 		try {
-			const response = await fetch(
-				"http://localhost:9002/api/v1/register",
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						username,
-						full_name: fullname,
-						email,
-						password,
-					}),
-				},
-			);
+			const response = await fetch("http://localhost:9002/api/v1/register", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					username,
+					full_name: fullname,
+					email,
+					password,
+				}),
+			});
 
 			const data = await response.json();
 			if (response.ok) {
@@ -60,7 +52,9 @@ export default function Register() {
 					<CardTitle className="text-3xl text-start font-bold text-blue-500 capitalize">
 						Circle app
 					</CardTitle>
-					<p className="text-white text-start text-2xl capitalize">Create account circle</p>
+					<p className="text-white text-start text-2xl capitalize">
+						Create account circle
+					</p>
 				</CardHeader>
 				<CardContent>
 					<form onSubmit={handleRegist} className="space-y-3">
@@ -125,12 +119,12 @@ export default function Register() {
 						)}
 
 						<div className="text-right text-white">
-							<a
-								href="#"
+							<Link
+								to={"/forgot_password"}
 								className="text-sm text-white hover:underline hover:underline-offset-4"
 							>
 								Forgot password?
-							</a>
+							</Link>
 						</div>
 
 						<Button
@@ -146,10 +140,7 @@ export default function Register() {
 
 						<p className="text-center text-zinc-400 text-sm mt-4 capitalize">
 							Already have an accoount?{" "}
-							<Link
-								to="/login"
-								className="text-green-500"
-							>
+							<Link to="/login" className="text-green-500">
 								Login
 							</Link>
 						</p>

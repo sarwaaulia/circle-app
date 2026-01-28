@@ -494,217 +494,108 @@ export default function ProfilePage() {
 	const BASE_URL = "http://localhost:9002/uploads/";
 
 	return (
-		<div className="bg-zinc-900 min-h-screen">
-			{/* Loading State */}
-			{loading && (
-				<div className="max-w-2xl mx-auto p-4">
-					<div className="text-center py-12 bg-zinc-800 rounded-lg">
-						<div className="text-white">Loading profile...</div>
-					</div>
-				</div>
-			)}
+        <div className="bg-zinc-900 min-h-screen text-white">
+            <div className="max-w-2xl mx-auto border-x border-zinc-800 min-h-screen pb-20">
+                {loading ? (
+                    <div className="flex justify-center items-center py-20">
+                        <div className="animate-pulse text-zinc-500">Loading profile...</div>
+                    </div>
+                ) : !profileUser ? (
+                    <div className="p-4 text-center py-12">
+                        <ArrowLeft className="cursor-pointer mx-auto mb-4" onClick={() => navigate("/")} />
+                        <h3 className="text-xl font-bold">This account doesn't exist</h3>
+                        <p className="text-zinc-500">Try searching for another.</p>
+                    </div>
+                ) : (
+                    <>
+                        {/* 1. Sticky Header */}
+                        <div className="sticky top-0 z-20 bg-zinc-900/80 backdrop-blur-md py-2 px-4 flex items-center gap-6 border-b border-zinc-800">
+                            <button onClick={() => navigate("/")} className="p-2 hover:bg-zinc-800 rounded-full transition-colors">
+                                <ArrowLeft size={20} />
+                            </button>
+                            <div>
+                                <h3 className="font-bold text-lg leading-tight">{profileUser.full_name}</h3>
+                                <p className="text-xs text-zinc-500">{userThreads.length} Posts</p>
+                            </div>
+                        </div>
 
-			{/* User not found */}
-			{!loading && !profileUser && (
-				<div className="max-w-2xl mx-auto p-4">
-					<div className="text-center py-12 bg-zinc-800 rounded-lg">
-						<ArrowLeft
-							className="cursor-pointer mx-auto mb-4 text-white"
-							size={48}
-							onClick={() => navigate("/")}
-						/>
-						<h3 className="text-white">User not found</h3>
-					</div>
-				</div>
-			)}
+                        {/* 2. Visuals Section */}
+                        <div className="relative">
+                            <div className="h-48 bg-zinc-800 overflow-hidden">
+                                <UserProfileHeader user={profileUser} clickable={false} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="absolute -bottom-16 left-4">
+                                <img
+                                    src={profileUser.photo_profile ? `${BASE_URL}${profileUser.photo_profile}` : "/default-avatar.png"}
+                                    className="w-32 h-32 rounded-full border-4 border-zinc-900 object-cover bg-zinc-800"
+                                    alt="profile"
+                                />
+                            </div>
+                        </div>
 
-			{/* Profile Content */}
-			{!loading && profileUser && (
-				<>
-					{/* Header top bar */}
-					<div
-						className="bg-zinc-800 py-4 px-4 font-semibold text-lg flex items-center gap-2 cursor-pointer hover:bg-zinc-700 transition-colors"
-						onClick={() => navigate("/")}
-					>
-						<ArrowLeft size={20} className="text-white" />
-						<h3 className="font-bold text-white">{profileUser.full_name}</h3>
-					</div>
+                        {/* 3. Action Buttons */}
+                        <div className="flex justify-end p-4 h-16">
+                            {isCurrentUser ? (
+                                <button onClick={handleEditProfile} className="px-5 py-2 border border-zinc-700 rounded-full font-bold text-sm hover:bg-zinc-800 transition-colors">
+                                    Edit Profile
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleFollow}
+                                    disabled={followLoading}
+                                    className={`px-6 py-2 rounded-full font-bold text-sm transition-all ${
+                                        isFollowing 
+                                        ? "bg-transparent border border-zinc-700 hover:border-red-500 hover:text-red-500" 
+                                        : "bg-white text-black hover:bg-zinc-200"
+                                    }`}
+                                >
+                                    {followLoading ? "..." : isFollowing ? "Following" : "Follow"}
+                                </button>
+                            )}
+                        </div>
 
-					{/* Header + Avatar */}
-					<div className="relative">
-						<UserProfileHeader
-							user={profileUser}
-							clickable={false}
-							className="mx-3 h-32 w-full rounded-lg object-cover"
-						/>
+                        {/* 4. Bio & Stats */}
+                        <div className="px-4 mt-4 space-y-3">
+                            <div>
+                                <h3 className="text-xl font-extrabold">{profileUser.full_name}</h3>
+                                <p className="text-zinc-500">@{profileUser.username}</p>
+                            </div>
+                            {profileUser.bio && <p className="text-[15px] whitespace-pre-wrap">{profileUser.bio}</p>}
+                            <div className="flex items-center gap-5 text-sm pt-1">
+                                <button onClick={handleFollowingClick} className="hover:underline flex gap-1">
+                                    <span className="font-bold">{stats.following}</span> <span className="text-zinc-500">Following</span>
+                                </button>
+                                <button onClick={handleFollowersClick} className="hover:underline flex gap-1">
+                                    <span className="font-bold">{stats.followers}</span> <span className="text-zinc-500">Followers</span>
+                                </button>
+                            </div>
+                        </div>
 
-						{/* Avatar */}
-						<img
-							src={
-								profileUser.photo_profile
-									? `http://localhost:9002/uploads/${profileUser.photo_profile}`
-									: "/default-avatar.png"
-							}
-							className="w-20 h-20 rounded-full border-4 border-blue-400 absolute left-6 -bottom-10 object-cover shrink-0 bg-zinc-800"
-							alt="profile"
-						/>
-					</div>
+                        {/* 5. Tabs & Content */}
+                        <div className="mt-4 border-b border-zinc-800 flex">
+                            {["posts", "media"].map((tab) => (
+                                <button key={tab} onClick={() => setActiveTab(tab as any)} className="flex-1 py-4 text-center relative hover:bg-zinc-800/50 transition-colors uppercase text-sm font-bold tracking-wider">
+                                    <span className={activeTab === tab ? "text-white" : "text-zinc-500"}>{tab}</span>
+                                    {activeTab === tab && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-blue-500 rounded-full" />}
+                                </button>
+                            ))}
+                        </div>
 
-					{/* Profile Info + Action Button */}
-					<div className="px-4 py-4 mt-8">
-						<div className="flex justify-between items-start">
-							<div className="flex-1">
-								{/* Name */}
-								<h3 className="text-xl font-bold text-white">
-									{profileUser.full_name}
-								</h3>
+                        <div className="min-h-[400px]">
+                            {activeTab === "posts" ? (
+                                <ProfilePosts userThreads={userThreads} threadsLoading={threadsLoading} isCurrentUser={isCurrentUser} profileUser={profileUser} onToggleLike={handleToggleThreadLike} />
+                            ) : (
+                                <ProfileMedia userThreads={userThreads} threadsLoading={threadsLoading} isCurrentUser={isCurrentUser} currentUser={currentUser} token={token} onOpenThreadModal={handleOpenThreadModal} BASE_URL={BASE_URL} />
+                            )}
+                        </div>
+                    </>
+                )}
+            </div>
 
-								{/* Username */}
-								<p className="text-zinc-400 text-sm">@{profileUser.username}</p>
-
-								{/* Bio */}
-								{profileUser.bio && (
-									<p className="mt-3 text-sm text-zinc-300 leading-relaxed">
-										{profileUser.bio}
-									</p>
-								)}
-
-								{/* Stats */}
-								<div className="flex items-center gap-6 text-sm mt-4">
-									<div
-										onClick={handleFollowersClick}
-										className="cursor-pointer hover:text-blue-400 transition-colors"
-									>
-										<span className="text-white font-bold">
-											{stats.followers}
-										</span>
-										<span className="text-zinc-400 ml-1">Followers</span>
-									</div>
-
-									<div
-										onClick={handleFollowingClick}
-										className="cursor-pointer hover:text-blue-400 transition-colors"
-									>
-										<span className="text-white font-bold">
-											{stats.following}
-										</span>
-										<span className="text-zinc-400 ml-1">Following</span>
-									</div>
-								</div>
-							</div>
-
-							{/* Action buttons */}
-							<div className="flex-shrink-0">
-								{isCurrentUser ? (
-									<button
-										className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
-										onClick={handleEditProfile}
-									>
-										Edit Profile
-									</button>
-								) : (
-									<button
-										className="px-4 py-2 text-sm rounded-lg cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed"
-										onClick={handleFollow}
-										disabled={followLoading}
-										style={{
-											backgroundColor: isFollowing ? "#dc2626" : "#2563eb",
-											color: "white",
-										}}
-									>
-										{followLoading
-											? "Loading..."
-											: isFollowing
-												? "Following"
-												: "Follow"}
-									</button>
-								)}
-							</div>
-						</div>
-					</div>
-
-					{/* Profile Tabs */}
-					<div className="mt-6 bg-zinc-800 rounded-lg mx-4 overflow-hidden">
-						<div className="flex">
-							<button
-								onClick={() => setActiveTab("posts")}
-								className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
-									activeTab === "posts"
-										? "text-blue-400 bg-zinc-700 border-b-2 border-blue-400"
-										: "text-zinc-400 hover:text-zinc-300 hover:bg-zinc-700"
-								}`}
-							>
-								All Posts
-							</button>
-
-							<button
-								onClick={() => setActiveTab("media")}
-								className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
-									activeTab === "media"
-										? "text-blue-400 bg-zinc-700 border-b-2 border-blue-400"
-										: "text-zinc-400 hover:text-zinc-300 hover:bg-zinc-700"
-								}`}
-							>
-								Media
-							</button>
-						</div>
-					</div>
-
-					{/* Tab Content */}
-					<div className="p-6">
-						{activeTab === "posts" && (
-							<ProfilePosts
-								userThreads={userThreads}
-								threadsLoading={threadsLoading}
-								isCurrentUser={isCurrentUser}
-								profileUser={profileUser}
-								onToggleLike={handleToggleThreadLike}
-							/>
-						)}
-
-						{activeTab === "media" && (
-							<ProfileMedia
-								userThreads={userThreads}
-								threadsLoading={threadsLoading}
-								isCurrentUser={isCurrentUser}
-								currentUser={currentUser}
-								token={token}
-								onOpenThreadModal={handleOpenThreadModal}
-								BASE_URL={BASE_URL}
-							/>
-						)}
-					</div>
-
-					{/* Followers/Following Modal */}
-					{followersFollowingModal.type && (
-						<FollowersFollowingModal
-							isOpen={followersFollowingModal.isOpen}
-							onClose={handleCloseFollowersFollowingModal}
-							type={followersFollowingModal.type}
-							userId={profileUser.id?.toString() || ""}
-						/>
-					)}
-
-					{/* Edit Profile Modal */}
-					<ProfileModal open={isModalOpen} onClose={handleCloseModal}>
-						<EditProfile onClose={handleCloseModal} />
-					</ProfileModal>
-
-					{/* Thread Details Modal */}
-					<ThreadDetailModal
-						isOpen={showThreadModal}
-						onClose={() => {
-							setShowThreadModal(false);
-							setSelectedThread(null);
-						}}
-						thread={selectedThread}
-						profileUser={profileUser}
-						token={token}
-						currentUser={currentUser}
-						onToggleLike={handleToggleThreadLike}
-					/>
-				</>
-			)}
-		</div>
-	);
+            {/* Modals outside the main scroll container */}
+            <FollowersFollowingModal isOpen={followersFollowingModal.isOpen} onClose={handleCloseFollowersFollowingModal} type={followersFollowingModal.type!} userId={profileUser?.id?.toString() || ""} />
+            <ProfileModal open={isModalOpen} onClose={handleCloseModal}><EditProfile onClose={handleCloseModal} /></ProfileModal>
+            <ThreadDetailModal isOpen={showThreadModal} onClose={() => setShowThreadModal(false)} thread={selectedThread} profileUser={profileUser} token={token} currentUser={currentUser} onToggleLike={handleToggleThreadLike} />
+        </div>
+    );
 }

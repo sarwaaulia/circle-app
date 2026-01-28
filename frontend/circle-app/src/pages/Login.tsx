@@ -127,12 +127,9 @@ export default function Login() {
 							)}
 
 							<div className="text-right text-white">
-								<a
-									href="#"
-									className="text-sm text-white hover:underline hover:underline-offset-4"
-								>
+								<Link to={"/forgot_password"} className="text-sm text-white hover:underline hover:underline-offset-4">
 									Forgot password?
-								</a>
+								</Link>
 							</div>
 
 							<Button

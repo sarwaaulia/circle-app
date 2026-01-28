@@ -2,6 +2,11 @@ import express from "express";
 import dotenv from "dotenv";
 import http from "http";
 import { WebSocketServer } from "ws";
+import { connectRedis } from './utils/redis';
+import { Request, Response } from "express";
+import redisClient from "./utils/redis";
+
+connectRedis();
 
 import authRoute from "./routes/auth";
 
@@ -16,7 +21,7 @@ import path from "path";
 dotenv.config({ path: "../.env" });
 
 const app = express();
-const port = 9002;
+const port = process.env.PORT || 9002;
 
 // Middleware
 app.use(express.json());
@@ -75,6 +80,20 @@ wss.on("connection", (ws) => {
 	ws.on("close", () => {
 		console.log("Client disconnected");
 	});
+});
+
+app.get("/test", async (req: Request, res: Response) => {
+	await redisClient.setEx('user:1', 60, 'Hype G12');
+	res.send('Data berhasil disimpan di Redis!');
+})
+
+app.get('/get-data', async (req: Request, res: Response) => {
+    const value = await redisClient.get('user:1');
+    if (value) {
+        res.send(`Data dari Redis: ${value}`);
+    } else {
+        res.status(404).send('Data tidak ditemukan atau sudah expired.');
+    }
 });
 
 // Jalankan server HTTP + WebSocket
