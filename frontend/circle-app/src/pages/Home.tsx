@@ -31,7 +31,7 @@ export default function HomePage() {
 		try {
 			await dispatch(toggleLikeAction({ threadId, currentIsLiked: likedStatus }))
 		} catch (err) {
-			toast.error("Gagal melakukan like");
+			toast.error("failed to handle like");
 		}
 	};
 
@@ -58,7 +58,7 @@ export default function HomePage() {
 				token={token!}
 				photo_profile={
 					currentUser?.photo_profile
-						? `http://localhost:9000/uploads/${currentUser.photo_profile}`
+						? `http://localhost:9002/uploads/${currentUser.photo_profile}`
 						: undefined
 				}
 				isOnThreadCreate={(newThread) =>

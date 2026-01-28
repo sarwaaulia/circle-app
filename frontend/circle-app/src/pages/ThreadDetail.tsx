@@ -73,7 +73,7 @@ export default function ThreadDetailPage() {
 
 	useEffect(() => {
 		if (currentUser && currentUser.photo_profile) {
-			setUserAva(`http://localhost:9000/uploads/${currentUser?.photo_profile}`);
+			setUserAva(`http://localhost:9002/uploads/${currentUser?.photo_profile}`);
 		} else {
 			setUserAva("https://ui-avatars.com/api/?name=" + currentUser?.username);
 		}
@@ -111,7 +111,7 @@ export default function ThreadDetailPage() {
 			setThreadLoading(true);
 			// Fetch thread detail
 			const threadRes = await fetch(
-				`http://localhost:9000/api/v1/${threadId}`,
+				`http://localhost:9002/api/v1/${threadId}`,
 				{
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -142,7 +142,7 @@ export default function ThreadDetailPage() {
 			}
 
 			const response = await fetch(
-				`http://localhost:9000/api/v1/replies/${threadId}`,
+				`http://localhost:9002/api/v1/replies/${threadId}`,
 				{
 					method: "POST",
 					headers: {

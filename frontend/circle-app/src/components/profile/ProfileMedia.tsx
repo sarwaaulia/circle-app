@@ -49,7 +49,7 @@ export default function ProfileMedia({
     // For other users, fetch like status for this thread
     if (!isCurrentUser) {
       try {
-        const likeStatusResponse = await fetch(`http://localhost:9000/api/v1/${thread.id}/like/status`, {
+        const likeStatusResponse = await fetch(`http://localhost:9002/api/v1/${thread.id}/like/status`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (likeStatusResponse.ok) {
@@ -80,6 +80,7 @@ export default function ProfileMedia({
             threadId: thread.id,
             createdAt: thread.createdAt
           })));
+          console.log(userThreads)
 
         return allImages.length > 0 ? (
           <div className="grid grid-cols-3 gap-4">

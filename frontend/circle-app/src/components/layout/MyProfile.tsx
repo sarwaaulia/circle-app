@@ -37,10 +37,10 @@ export function ProfileCard() {
         try {
 
             const [resFollowers, resFollowing] = await Promise.all([
-                fetch(`http://localhost:9000/api/user/${user.id}/followers`, {
+                fetch(`http://localhost:9002/api/user/${user.id}/followers`, {
                     headers: { Authorization: `Bearer ${token}` },
                 }),
-                fetch(`http://localhost:9000/api/user/${user.id}/following`, {
+                fetch(`http://localhost:9002/api/user/${user.id}/following`, {
                     headers: { Authorization: `Bearer ${token}` },
                 }),
             ]);
@@ -127,11 +127,11 @@ export function ProfileCard() {
 	};
 
 	const headerSrc = user?.header
-		? `http://localhost:9000/uploads/${user.header}`
+		? `http://localhost:9002/uploads/${user.header}`
 		: "https://cdn.pixabay.com/photo/2025/08/29/11/16/norway-9803687__480.jpg";
 
 	const profileSrc = user?.photo_profile
-		? `http://localhost:9000/uploads/${user.photo_profile}`
+		? `http://localhost:9002/uploads/${user.photo_profile}`
 		: "https://pixabay.com/vectors/flower-ornament-frame-border-4634053/";
 
 	const debug = useSelector((state: any) => state.user);

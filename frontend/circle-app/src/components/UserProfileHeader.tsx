@@ -22,7 +22,7 @@ export default function UserProfileHeader({
 }: UserProfileHeaderProps) {
 
   const navigate = useNavigate();
-  const BASE_URL = 'http://localhost:3002/uploads/';
+  const BASE_URL = 'http://localhost:9002/uploads/';
 
   const handleClick = () => {
     if (clickable) navigate(`/profile/${user.id}`);

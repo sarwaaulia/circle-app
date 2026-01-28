@@ -35,7 +35,7 @@ export default function ReplyCard({
 				<img
 					src={
 						reply.user?.photo_profile
-							? `http://localhost:9000/uploads/${reply.user?.photo_profile}`
+							? `http://localhost:9002/uploads/${reply.user?.photo_profile}`
 							: "undefined"
 					}
 					className="h-8 w-8 rounded-full object-cover"
@@ -56,7 +56,7 @@ export default function ReplyCard({
 
 				{reply.image && (
 					<img
-						src={`http://localhost:9000/uploads/${reply.image}`}
+						src={`http://localhost:9002/uploads/${reply.image}`}
 						className="rounded-xl mt-3 max-h-96 object-cover"
 					/>
 				)}

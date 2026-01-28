@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 export interface CreateReplyThread {
   content: string;
-  image: string;
+  image: string[];
   userId: number;
   threadId: number;
   created_by: string;
@@ -13,7 +13,7 @@ export interface CreateReplyThread {
 
 export interface UpdateReplyThread {
   content?: string;
-  image?: string;
+  image: string[];
   updated_by: string;
   updated_at?: Date;
 }

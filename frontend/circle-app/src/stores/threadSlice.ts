@@ -18,7 +18,7 @@ const initialState: ThreadState = {
 // fetch threads menggunakan async thunk
 export const fetchThreads = createAsyncThunk("threads/fetchAll", async () => {
 	try {
-		const response = await fetch("http://localhost:9000/api/v1/threads", {
+		const response = await fetch("http://localhost:9002/api/v1/threads", {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("token")}`,
 			},
@@ -41,7 +41,7 @@ export const fetchThreadId = createAsyncThunk(
 	"threads/fetchId",
 	async (id: number) => {
 		try {
-			const response = await fetch(`http://localhost:9000/api/v1/${id}`, {
+			const response = await fetch(`http://localhost:9002/api/v1/${id}`, {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem("token")}`,
 				},
@@ -71,7 +71,7 @@ export const toggleLike = createAsyncThunk(
 	}) => {
 		try {
 			const response = await fetch(
-				`http://localhost:9000/api/v1/${threadId}/thread/like`,
+				`http://localhost:9002/api/v1/${threadId}/thread/like`,
 				{
 					method: "POST",
 					headers: {
@@ -88,7 +88,7 @@ export const toggleLike = createAsyncThunk(
 
 			// fetch status like agar akurat
 			const statusResponse = await fetch(
-				`http://localhost:9000/api/v1/${threadId}/like/status`,
+				`http://localhost:9002/api/v1/${threadId}/like/status`,
 				{
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -104,7 +104,9 @@ export const toggleLike = createAsyncThunk(
 				// Fallback jka gagal maka kalkulasi manual
 				return { threadId, isLiked: !currentIsLiked, likesCount: 0 }; // jumlah like dengan optimistic update
 			}
-		} catch (error) {}
+		} catch (error) {
+			console.error(`cannot toggling like`, error)
+		}
 	},
 );
 

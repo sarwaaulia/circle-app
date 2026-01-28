@@ -19,7 +19,7 @@ export const fetchThreadReply = createAsyncThunk(
 	"replies/fetchByThread",
 	async (threadId: number) => {
 		const response = await fetch(
-			`http://localhost:9000/api/v1/replies/thread/${threadId}`,
+			`http://localhost:9002/api/v1/replies/thread/${threadId}`,
 			{
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -45,7 +45,7 @@ export const toggleReplyLike = createAsyncThunk(
 		currentIsLiked: boolean;
 	}) => {
 		const response = await fetch(
-			`http://localhost:9000/api/v1/replies/${replyId}/like`,
+			`http://localhost:9002/api/v1/replies/${replyId}/like`,
 			{
 				method: "PUT",
 				headers: {

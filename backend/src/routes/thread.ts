@@ -21,7 +21,7 @@ router.get("/:id", authenticate, threadController.getThreadById);
 router.post(
 	"/threads",
 	authenticate,
-	upload.any(),
+	upload.array("image", 5),
 	threadController.createThread,
 );
 

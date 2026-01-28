@@ -38,7 +38,7 @@ export default function FollowersFollowingModal({ isOpen, onClose, type, userId,
     setLoading(true);
     try {
       // Fetch the list (followers or following)
-      const listResponse = await fetch(`http://localhost:9000/api/user/${userId}/${type}`, {
+      const listResponse = await fetch(`http://localhost:9002/api/user/${userId}/${type}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -48,7 +48,7 @@ export default function FollowersFollowingModal({ isOpen, onClose, type, userId,
       }
       
       if (currentUser?.id && type === 'followers') {
-        const followingResponse = await fetch(`http://localhost:9000/api/user/${currentUser.id}/following`, {
+        const followingResponse = await fetch(`http://localhost:9002/api/user/${currentUser.id}/following`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -82,7 +82,7 @@ export default function FollowersFollowingModal({ isOpen, onClose, type, userId,
     if (!token) return;
 
     try {
-      const response = await fetch('http://localhost:9000/api/user/follow', {
+      const response = await fetch('http://localhost:9002/api/user/follow', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -117,7 +117,7 @@ export default function FollowersFollowingModal({ isOpen, onClose, type, userId,
     if (!token) return;
 
     try {
-      const response = await fetch('http://localhost:9000/api/user/unfollow', {
+      const response = await fetch('http://localhost:9002/api/user/unfollow', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -151,7 +151,7 @@ export default function FollowersFollowingModal({ isOpen, onClose, type, userId,
     }
   };
 
-  const BASE_URL = 'http://localhost:9000/uploads/';
+  const BASE_URL = 'http://localhost:9002/uploads/';
 
   if (!isOpen) return null;
 

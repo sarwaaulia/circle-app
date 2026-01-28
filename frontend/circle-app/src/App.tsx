@@ -46,7 +46,7 @@ function AppWrapper() {
 			}
 
 			try {
-				const res = await axios.get("http://localhost:9000/api/v1/me", {
+				const res = await axios.get("http://localhost:9002/api/v1/me", {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},

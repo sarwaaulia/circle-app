@@ -60,7 +60,7 @@ export default function ReplyInput({
 				<img
 					src={
 						currentUser?.photo_profile
-							? `http://localhost:9000/uploads/${currentUser?.photo_profile}`
+							? `http://localhost:9002/uploads/${currentUser?.photo_profile}`
 							: "undefined"
 					}
 					className="h-8 w-8 rounded-full object-cover"

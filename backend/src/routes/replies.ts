@@ -9,7 +9,7 @@ const router = express.Router()
 router.get('/thread/:threadId', authenticate, repliesController.getRepliesByThread);
 
 // create a new reply (protected)
-router.post("/:threadId", authenticate, upload.any(), repliesController.createReply);
+router.post("/:threadId", authenticate, upload.array("image", 5), repliesController.createReply);
 
 // update reply (protected)
 router.put('/:id', authenticate, repliesController.updateReply);

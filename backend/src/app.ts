@@ -4,13 +4,11 @@ import http from "http";
 import { WebSocketServer } from "ws";
 
 import authRoute from "./routes/auth";
-import userRouteAuth from "./routes/auth";
 
 import threadRoute from "./routes/thread";
 import likesRoute from "./routes/likes";
-import userRoute from "./routes/user";
 import repliesRoute from "./routes/replies";
-import followRoute from "./routes/follows"
+import followRoute from "./routes/follows";
 
 import corsMiddleware from "./middlewares/cors";
 import path from "path";
@@ -18,22 +16,22 @@ import path from "path";
 dotenv.config({ path: "../.env" });
 
 const app = express();
-const port = process.env.PORT;
+const port = 9002;
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(corsMiddleware);
 
-const uploadsPath = path.join(__dirname, "uploads");
+const uploadsPath = path.join(process.cwd(), "src/uploads");
 app.use("/uploads", express.static(uploadsPath));
 console.log("SERVING UPLOADS FROM:", uploadsPath);
 
 // Routes
-app.use("/api/v1", authRoute, userRouteAuth);
-app.use("/api/v1", threadRoute, likesRoute, userRoute);
+app.use("/api/v1", authRoute);
+app.use("/api/v1", threadRoute, likesRoute);
 app.use("/api/v1/replies", repliesRoute);
-app.use("/api/user", followRoute)
+app.use("/api/user", followRoute);
 
 // Error handling middleware
 app.use(

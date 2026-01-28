@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setAuth } from "../../stores/userSlice";
 
-const BASE_URL = 'http://localhost:9000/uploads/';
+const BASE_URL = 'http://localhost:9002/uploads/';
 
 export default function EditProfile({ onClose }: { onClose?: () => void }) {
   const user = useSelector((state: any) => state.user.user);
@@ -58,7 +58,7 @@ export default function EditProfile({ onClose }: { onClose?: () => void }) {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch(`http://localhost:9000/api/v1/user`, {
+      const response = await fetch(`http://localhost:9002/api/v1/user`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

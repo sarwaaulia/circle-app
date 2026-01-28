@@ -52,7 +52,7 @@ export default function ThreadDetailModal({
 	const [replyContent, setReplyContent] = useState("");
 	const [replySubmitting, setReplySubmitting] = useState(false);
 
-	const BASE_URL = "http://localhost:9000/uploads/";
+	const BASE_URL = "http://localhost:9002/uploads/";
 
 	if (!isOpen || !thread || !profileUser) return null;
 
@@ -115,7 +115,7 @@ export default function ThreadDetailModal({
 			if (image) formData.append("image", image);
 
 			const response = await fetch(
-				`http://localhost:9000/api/replies/${thread.id}`,
+				`http://localhost:9002/api/replies/${thread.id}`,
 				{
 					method: "POST",
 					headers: { Authorization: `Bearer ${token}` },

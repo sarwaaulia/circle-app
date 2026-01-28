@@ -6,7 +6,7 @@ let socket: WebSocket | null = null;
 export const connect = (token: string) => {
 	if (socket && socket.readyState === WebSocket.OPEN) return socket;
 
-	socket = new WebSocket("ws://localhost:9000");
+	socket = new WebSocket("ws://localhost:9002");
 
 	socket.onopen = () => {
 		console.log("✅ WS Connected");
@@ -65,7 +65,7 @@ const handleGlobalUpdate = (data: any) => {
             break;
         }
 
-        case "LIKE_UPDATE": {
+        case "LIKED_UPDATE": {
             store.dispatch(updateThread({ 
                 id: data.threadId, 
                 likesCount: data.likesCount 

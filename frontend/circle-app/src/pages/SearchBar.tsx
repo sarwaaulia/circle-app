@@ -41,7 +41,7 @@ export default function SearchBar() {
 			try {
 				setSearchLoading(true);
 				const response = await fetch(
-					`http://localhost:9000/api/user/search?q=${encodeURIComponent(searchQuery)}`,
+					`http://localhost:9002/api/user/search?q=${encodeURIComponent(searchQuery)}`,
 					{
 						headers: {
 							Authorization: `Bearer ${token}`,
@@ -111,7 +111,7 @@ export default function SearchBar() {
 			// fetch search results and current user's following list
 			const [searchResponse, followingResponse] = await Promise.all([
 				fetch(
-					`http://localhost:9000/api/user/search?q=${encodeURIComponent(query)}`,
+					`http://localhost:9002/api/user/search?q=${encodeURIComponent(query)}`,
 					{
 						headers: token ? { Authorization: `Bearer ${token}` } : {},
 						credentials: "include",
@@ -119,7 +119,7 @@ export default function SearchBar() {
 				),
 				currentUser?.id
 					? fetch(
-							`http://localhost:9000/api/user/${currentUser.id}/following`,
+							`http://localhost:9002/api/user/${currentUser.id}/following`,
 							{
 								headers: token ? { Authorization: `Bearer ${token}` } : {},
 								credentials: "include",
@@ -142,10 +142,8 @@ export default function SearchBar() {
 				const followResult = await followingResponse.json();
 				// Sesuaikan juga jika endpoint following mengembalikan { data: [...] }
 				followingList = followResult.data || followResult;
-
 			} else if (followingResponse) {
 				console.log("Following fetch failed:", followingResponse.status);
-
 			} else {
 				console.log("No following response (no current user)");
 			}
@@ -171,7 +169,7 @@ export default function SearchBar() {
 		if (!token) return;
 
 		try {
-			const response = await fetch("http://localhost:9000/api/user/follow", {
+			const response = await fetch("http://localhost:9002/api/user/follow", {
 				method: "POST",
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -208,13 +206,12 @@ export default function SearchBar() {
 	const handleSuggestionClick = (user: SearchUser) => {
 		setQuery(user.username); // Set the username in the input
 		setShowSuggestions(false);
-		// Allow user to then click search button
 	};
 
-	const BASE_URL = "http://localhost:9000/uploads/";
+	const BASE_URL = "http://localhost:9002/uploads/";
 
 	return (
-		<div className="max-w-2xl mx-auto p-4 relative">
+		<div className="flex-1 ml-64 mr-80 border-l border-r border-neutral-800 p-6 relative">
 			{/* Header */}
 			<div className="flex items-center gap-4 mb-6">
 				<ArrowLeft

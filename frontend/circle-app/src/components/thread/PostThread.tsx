@@ -45,13 +45,13 @@ const CreateThread = forwardRef<CreateThreadRef, CreateThreadProps>(
 			e.preventDefault();
 			if (!content.trim() && !image) return;
 
+			setLoading(true)
 			const form = new FormData();
-
 			form.append("content", content);
 			if (image) {form.append("image", image)};
 
 			try {
-				const res = await fetch("http://localhost:9000/api/v1/threads", {
+				const res = await fetch("http://localhost:9002/api/v1/threads", {
 					method: "POST",
 					headers: { Authorization: `Bearer ${token}` },
 					body: form,
@@ -92,7 +92,7 @@ const CreateThread = forwardRef<CreateThreadRef, CreateThreadProps>(
 							<img
 								src={
 									currentUser?.photo_profile
-										? `http://localhost:9000/uploads/${currentUser.photo_profile}`
+										? `http://localhost:9002/uploads/${currentUser.photo_profile}`
 										: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
 								}
 								className="w-10 h-10 rounded-full object-cover"
@@ -173,7 +173,7 @@ const CreateThread = forwardRef<CreateThreadRef, CreateThreadProps>(
 						<img
 							src={
 								currentUser?.photo_profile
-									? `http://localhost:9000/uploads/${currentUser.photo_profile}`
+									? `http://localhost:9002/uploads/${currentUser.photo_profile}`
 									: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
 							}
 							className="w-10 h-10 rounded-full object-cover"

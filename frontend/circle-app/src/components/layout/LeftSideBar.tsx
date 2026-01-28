@@ -88,7 +88,7 @@ export default function LeftSidebar() {
 					token={token}
 					photo_profile={
 						currentUser?.photo_profile
-							? `http://localhost:9000/uploads/${currentUser.photo_profile}`
+							? `http://localhost:9002/uploads/${currentUser.photo_profile}`
 							: undefined
 					}
 					isOnThreadCreate={handleThreadCreated}

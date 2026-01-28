@@ -30,13 +30,13 @@ class ReplyController {
 			}
 
 			const { content } = req.body;
-			let image = req.file ? req.file.filename : null;
+			let images: string[] = [];
 
-			if (Array.isArray(req.files)) {
-				const uploadedImg = req.files.find((f: any) => f.fieldname === "image");
-				if (uploadedImg) {
-					image = uploadedImg.filename;
-				}
+			if (req.files && Array.isArray(req.files)) {
+				// Ambil semua filename dan masukkan ke dalam array images
+				images = (req.files as Express.Multer.File[]).map(
+					(file) => file.filename,
+				);
 			}
 
 			const authUser = (req as any).user;
@@ -53,7 +53,7 @@ class ReplyController {
 			const createdReply = await prisma.reply.create({
 				data: {
 					content,
-					image: image || "",
+					image: images,
 					userId: authUser.id,
 					threadId,
 					created_by: authUser.id.toString(),

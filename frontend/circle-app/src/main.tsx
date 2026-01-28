@@ -7,7 +7,7 @@ import axios from 'axios';
 import ReactDOM from "react-dom/client"
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'http://localhost:9000/api/v1';
+axios.defaults.baseURL = 'http://localhost:9001/api/v1';
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
 	<StrictMode>

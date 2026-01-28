@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 export interface createThread {
 	content: string;
-	image?: string;
+	images: [];
 	number_of_replies?: number;
 	createdBy: string;
 	updatedBy: string;
@@ -12,7 +12,7 @@ export interface createThread {
 
 export interface updateThread {
 	content?: string;
-	image?: string;
+	image: [];
 	number_of_replies?: number;
 	updatedBy: string;
 }
@@ -22,7 +22,7 @@ class ThreadModel {
 		return prisma.thread.create({
 			data: {
 				content: data.content,
-				image: data.image,
+				image: data.images,
 				number_of_replies: data.number_of_replies ?? 0,
 				createdBy: data.createdBy,
 				updatedBy: data.updatedBy,

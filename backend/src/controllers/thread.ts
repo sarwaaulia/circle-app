@@ -136,20 +136,20 @@ class ThreadController {
 			}
 
 			const { content } = req.body;
-			let image = req.file ? req.file.filename : null;
+			let images: string[] = [];
 
-			if (Array.isArray(req.files)) {
-				const uploadedImg = req.files.find((f: any) => f.fieldname === "image");
-				if (uploadedImg) {
-					image = uploadedImg.filename;
-				}
+			if (req.files && Array.isArray(req.files)) {
+				// Ambil semua filename dan masukkan ke dalam array images
+				images = (req.files as Express.Multer.File[]).map(
+					(file) => file.filename,
+				);
 			}
 			const authUser = (req as any).user;
-			
+
 			// Fetch user info for the new thread
 			const newThread = await ThreadModel.create({
 				content,
-				image: image || "",
+				images: images as any,
 				number_of_replies: 0,
 				createdBy: authUser.id.toString(),
 				updatedBy: authUser.id.toString(),
@@ -157,8 +157,8 @@ class ThreadController {
 
 			const fullThread = await ThreadModel.getById(newThread.id);
 
-			if(!fullThread) throw new Error("failed to retrieve complete thread data ");
-			
+			if (!fullThread)
+				throw new Error("failed to retrieve complete thread data ");
 
 			// BROADCAST DATA FINAL
 			broadcast({
@@ -167,9 +167,9 @@ class ThreadController {
 			});
 
 			return res.status(201).json({
-            success: true,
-            data: fullThread
-        });
+				success: true,
+				data: fullThread,
+			});
 		} catch (error) {
 			res.status(500).json({
 				success: false,
@@ -403,7 +403,6 @@ class ThreadController {
 					liked: false,
 					message: "LIKE_UPDATE",
 				});
-
 			}
 
 			// Kalau BELUM LIKE → CREATE LIKE
